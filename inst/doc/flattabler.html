@@ -14,7 +14,7 @@
 
 <meta name="date" content="2020-06-20" />
 
-<title>flattabler: Obtaining a Flat Table from Pivot Tables in R</title>
+<title>flattabler: Obtaining a Flat Table from Pivot Tables</title>
 
 <script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
 // v0.0.1
@@ -317,7 +317,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">flattabler: Obtaining a Flat Table from Pivot Tables in R</h1>
+<h1 class="title toc-ignore">flattabler: Obtaining a Flat Table from Pivot Tables</h1>
 <h4 class="author">Jose Samos (<a href="mailto:jsamos@ugr.es" class="email">jsamos@ugr.es</a>)</h4>
 <h4 class="date">2020-06-20</h4>
 
@@ -710,7 +710,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="transforming-a-pivot-table" class="section level2">
 <h2>Transforming a pivot table</h2>
-<p>The transformation to obtain the flat table from the pivot table has been carried out in R, using <code>flattabler</code> package. The code is shown below. For clarity, the pipe operator syntax provided by <code>tidyr</code> package has been used.</p>
+<p>The transformation to obtain the flat table from the pivot table has been carried out using <code>flattabler</code> package. The code is shown below. For clarity, the pipe operator syntax provided by <code>tidyr</code> package has been used.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(flattabler)</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(tidyr)</span>
 <span id="cb1-3"><a href="#cb1-3"></a></span>
@@ -795,25 +795,25 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">M1</td>
 <td align="center">a1</td>
 <td align="center">b2</td>
-<td align="center">e2</td>
+<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">5.55</td>
+<td align="center">3.89</td>
 </tr>
 <tr class="even">
+<td align="center">M1</td>
+<td align="center">a1</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">3.65</td>
+</tr>
+<tr class="odd">
 <td align="center">M1</td>
 <td align="center">a1</td>
 <td align="center">b3</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
 <td align="center">2.33</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.87</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
@@ -827,19 +827,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">M1</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
-<td align="center">e2</td>
+<td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">2.13</td>
+<td align="center">1.94</td>
 </tr>
 <tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.82</td>
-</tr>
-<tr class="odd">
 <td align="center">M1</td>
 <td align="center">a2</td>
 <td align="center">b3</td>
@@ -847,69 +839,61 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d2</td>
 <td align="center">1.78</td>
 </tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">a1</td>
+<td align="center">b1</td>
+<td align="center">e2</td>
+<td align="center">d2</td>
+<td align="center">7</td>
+</tr>
 <tr class="even">
 <td align="center">M2</td>
 <td align="center">a1</td>
-<td align="center">b2</td>
+<td align="center">b3</td>
 <td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">19</td>
+<td align="center">28</td>
 </tr>
 <tr class="odd">
 <td align="center">M2</td>
 <td align="center">a2</td>
+<td align="center">b3</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">24</td>
+</tr>
+<tr class="even">
+<td align="center">M3</td>
+<td align="center">a1</td>
 <td align="center">b2</td>
 <td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">18</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">13</td>
+<td align="center">52.31</td>
 </tr>
 <tr class="odd">
 <td align="center">M3</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">44.62</td>
+<td align="center">d1</td>
+<td align="center">111.70</td>
 </tr>
 <tr class="even">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">34.08</td>
-</tr>
-<tr class="odd">
 <td align="center">M3</td>
 <td align="center">a2</td>
 <td align="center">b2</td>
 <td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">65.92</td>
-</tr>
-<tr class="even">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">74.62</td>
+<td align="center">d2</td>
+<td align="center">70.78</td>
 </tr>
 <tr class="odd">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">42.25</td>
+<td align="center">M4</td>
+<td align="center">a1</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">964.57</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
@@ -921,19 +905,35 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
+<td align="center">a1</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">1561.52</td>
+<td align="center">1473.56</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">a2</td>
+<td align="center">b1</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">1034.02</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">a2</td>
+<td align="center">b1</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">2455.20</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
 <td align="center">a2</td>
 <td align="center">b2</td>
-<td align="center">e1</td>
+<td align="center">e2</td>
 <td align="center">d2</td>
-<td align="center">687.32</td>
+<td align="center">85.26</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
@@ -1195,7 +1195,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1>Pivot table operations</h1>
 <p>To transform one or more pivot tables into a flat table, the workflow is as follows:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Pivot table import</strong>: Import pivot tables into an object or list of objects. We start from data in text files, or previously imported data in a data frame, and generate pivot table objects from them.</p></li>
+<li><p><strong>Pivot table import</strong>: Import pivot tables into an object or list of objects. We start from data in text or Excel files, or previously imported data in a data frame, and generate pivot table objects from them.</p></li>
 <li><p><strong>Pivot table definition</strong>: Study the structure of the data and define the pivot table. If there are several homogeneous pivot tables, we will focus on one, the definition should be applicable to all of them.</p>
 <ul>
 <li>Define the characteristics of the pivot table: Number of rows and columns with labels, and page value (identifies the pivot table).</li>
@@ -1207,8 +1207,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>In this section, the operations available in <code>flattabler</code> package, classified according to this workflow, are presented.</p>
 <div id="pivot-table-import" class="section level2">
 <h2>Pivot table import</h2>
-<p>The objective of import operations is to obtain external data that contains one or more pivot tables to transform them. Two formats have been considered: text file, and data frame.</p>
-<p>In the case of working with files, the situation of jointly treating all the files in a folder has also been considered.</p>
+<p>The objective of import operations is to obtain external data that contains one or more pivot tables to transform them. Three formats have been considered: text file, Excel file, and data frame.</p>
+<p>In the case of working with files, the situation of jointly treating all the files in a folder has also been considered. In the case of Excel, alternatively, all the sheets in a file can be treated together.</p>
 <p>The S3 <code>pivot_table</code> class has been defined in the package. Transform operations are defined for objects of this class. Import operations can be classified into two groups: those that return a <code>pivot_table</code> object, and those that return a list of <code>pivot_table</code> objects. Objects in a list can be transformed together.</p>
 <div id="operations-that-return-an-object" class="section level3">
 <h3>Operations that return an object</h3>
@@ -1222,14 +1222,29 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_ie.csv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
 <span id="cb5-2"><a href="#cb5-2"></a>pt_set_v_ie &lt;-<span class="st"> </span><span class="kw">read_text_file</span>(file)</span></code></pre></div>
+<ul>
+<li><code>read_excel_sheet()</code>:. Reads an Excel file sheet and creates a <code>pivot_table</code> object. The sheet is expected to contain one or more pivot tables. Each line in the sheet corresponds to a row in a table. The file and sheet names are included as part of the object attributes. Example:</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excel/ine2871.xlsx&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>pt &lt;-<span class="st"> </span><span class="kw">read_excel_sheet</span>(file)</span></code></pre></div>
 </div>
 <div id="operations-that-return-a-list-of-objects" class="section level3">
 <h3>Operations that return a list of objects</h3>
 <ul>
 <li><code>read_text_folder()</code>: Reads all text files in a folder and creates a list of <code>pivot_table</code> objects, one from each file. Each file is expected to contain a pivot table. Each line in a file corresponds to a row in a table; within each row, columns are defined by a separator character. File name is included as part of each object attributes. Example:</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>folder &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csvfolder&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb6-2"><a href="#cb6-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_text_folder</span>(folder)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>folder &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csvfolder&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_text_folder</span>(folder)</span></code></pre></div>
+<ul>
+<li><code>read_excel_folder()</code>: Reads one sheet from each of the Excel files in a folder and creates a list of <code>pivot_table</code> objects, one from each sheet or, which is the same in this case, one from each file. Each sheet is expected to contain a pivot table. Each line in a file corresponds to a row in a table. File and sheet names are included as part of each object attributes. Example:</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>folder &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excelfolder&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_excel_folder</span>(folder)</span></code></pre></div>
+<ul>
+<li><code>read_excel_file()</code>: Reads sheets from an Excel file and creates a <code>pivot_table</code> object list, one from each sheet. Each sheet is expected to contain a pivot table. Each line in a sheet corresponds to a row in a table. The file and sheet names are included as part of each object attributes. Example:</li>
+</ul>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excel/set_sheets.xlsx&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_excel_file</span>(file)</span></code></pre></div>
 </div>
 </div>
 <div id="pivot-table-definition" class="section level2">
@@ -1258,30 +1273,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li><code>view_table_attr()</code>: Based on <code>utils::View()</code> but, unlike it, in addition to the table, it also displays the attributes of the object in another window. Example:</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_ie.csv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2"></a>pt_set_v_ie &lt;-<span class="st"> </span><span class="kw">read_text_file</span>(file)</span>
-<span id="cb7-3"><a href="#cb7-3"></a></span>
-<span id="cb7-4"><a href="#cb7-4"></a>pt_set_v_ie <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">view_table_attr</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_ie.csv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>pt_set_v_ie &lt;-<span class="st"> </span><span class="kw">read_text_file</span>(file)</span>
+<span id="cb10-3"><a href="#cb10-3"></a></span>
+<span id="cb10-4"><a href="#cb10-4"></a>pt_set_v_ie <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">view_table_attr</span>()</span></code></pre></div>
 </div>
 <div id="split-a-text-table" class="section level3">
 <h3>Split a text table</h3>
 <ul>
-<li><code>divide()</code>: Divides a table into tables separated by some empty row or column. Sometimes multiple pivot tables are placed in a text document, imported as one text table. This operation recursively divides the initial table into tables separated by some empty row or column. Once a division has been made, it tries to divide each part of the result. An object is generated for each indivisible pivot table. Returns a list of <code>pivot_table</code> objects. Example:</li>
+<li><code>divide()</code>: Divides a table into tables separated by some empty row or column. Sometimes multiple pivot tables are placed in a text document or Excel sheet, imported as one text table. This operation recursively divides the initial table into tables separated by some empty row or column. Once a division has been made, it tries to divide each part of the result. An object is generated for each indivisible pivot table. Returns a list of <code>pivot_table</code> objects. Example:</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>list_pt_ie &lt;-<span class="st"> </span>pt_set_v_ie <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">divide</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>list_pt_ie &lt;-<span class="st"> </span>pt_set_v_ie <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">divide</span>()</span></code></pre></div>
 </div>
 <div id="define-pivot-table-characteristics" class="section level3">
 <h3>Define pivot table characteristics</h3>
 <ul>
 <li><code>get_page()</code> and <code>set_page()</code>: The page value is defined when importing data, sometimes it is included in the file or spreadsheet name. Using these functions, you can get the defined values and redefine them. The content of a table cell or string can be defined as a page value. Example:</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>pt &lt;-<span class="st"> </span>list_pt_ie[[<span class="dv">1</span>]]</span>
-<span id="cb9-2"><a href="#cb9-2"></a></span>
-<span id="cb9-3"><a href="#cb9-3"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>pt &lt;-<span class="st"> </span>list_pt_ie[[<span class="dv">1</span>]]</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
 <ul>
 <li><code>define_labels()</code>: A pivot table should only contain label rows and columns, and an array of values, usually numeric data. This function defines the quantity of rows and columns that contain labels. Example:</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <div id="remove-rows-and-columns" class="section level3">
 <h3>Remove rows and columns</h3>
@@ -1295,7 +1310,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>remove_right()</code></li>
 </ul>
 <p>Remove rows and columns that are not part of the pivot table. The most frequent situation will be having to eliminate the header or footer of the table (top and bottom rows), the rest of the functions are defined to try to contemplate all possible cases. Example:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_top</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_top</span>(<span class="dv">1</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="pivot-table-transformation" class="section level2">
@@ -1306,36 +1321,36 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li><code>fill_labels()</code>: Fills missing values in row and column labels for a pivot table. When there is more than one row or column with labels, the first ones usually do not repeat the values. In the illustrative example, this occurs in column <em>c1</em> and row <em>r2</em>. In columns they are filled down; in rows to the right. Example:</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fill_labels</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fill_labels</span>()</span></code></pre></div>
 <ul>
 <li><code>remove_agg()</code>: Removes pivot table rows and columns that contain aggregated data. Aggregated data is recognized because the label of the row or column closest to the array of values is empty or has a special value as an indicator. Example:</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_agg</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_agg</span>()</span></code></pre></div>
 <ul>
 <li><code>extract_labels()</code>: Sometimes a table column includes values of multiple label fields, this is generally known as compact table format. Given a column number and a set of labels, it generates a new column with the labels located at the positions they occupied in the original column and removes them from it. Example:</li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>pt2 &lt;-<span class="st"> </span>pt_m4_compact <span class="op">%&gt;%</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="st">  </span><span class="kw">extract_labels</span>(<span class="dt">col =</span> <span class="dv">1</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;b1&quot;</span>, <span class="st">&quot;b2&quot;</span>, <span class="st">&quot;b3&quot;</span>, <span class="st">&quot;b4&quot;</span>, <span class="st">&quot;Total general&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>pt2 &lt;-<span class="st"> </span>pt_m4_compact <span class="op">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="st">  </span><span class="kw">extract_labels</span>(<span class="dt">col =</span> <span class="dv">1</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;b1&quot;</span>, <span class="st">&quot;b2&quot;</span>, <span class="st">&quot;b3&quot;</span>, <span class="st">&quot;b4&quot;</span>, <span class="st">&quot;Total general&quot;</span>))</span></code></pre></div>
 <ul>
 <li><code>get_col_values()</code>: To facilitate the study of the labels included in the same column of several tables, this function gets the values of the indicated column in a list of tables. It may be useful to use it before <code>extract_labels()</code>. Example:</li>
 </ul>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>df &lt;-<span class="st"> </span><span class="kw">get_col_values</span>(list_pt_compact, <span class="dt">start_row =</span> <span class="dv">4</span>)</span>
-<span id="cb15-2"><a href="#cb15-2"></a>labels &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(df<span class="op">$</span>label))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>df &lt;-<span class="st"> </span><span class="kw">get_col_values</span>(list_pt_compact, <span class="dt">start_row =</span> <span class="dv">4</span>)</span>
+<span id="cb18-2"><a href="#cb18-2"></a>labels &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(df<span class="op">$</span>label))</span></code></pre></div>
 </div>
 <div id="transform-values" class="section level3">
 <h3>Transform values</h3>
 <ul>
 <li><code>fill_values()</code>: The array of values has gaps that, instead of having a numeric value, have an empty string. This operation fills with <code>NA</code> missing values in a pivot table value array. Example:</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fill_values</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fill_values</span>()</span></code></pre></div>
 <ul>
 <li><code>remove_k()</code>: Values, even though they are numbers, are represented as text and sometimes include a thousands separator that can be removed using this function. Example:</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_k</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_k</span>()</span></code></pre></div>
 <ul>
 <li><code>replace_dec()</code>: Values, even though they are numbers, are represented as text and sometimes include a decimal separator different from the one needed; it can be replaced using this function. Example:</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">replace_dec</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">replace_dec</span>()</span></code></pre></div>
 </div>
 </div>
 <div id="flat-table-generation" class="section level2">
@@ -1347,27 +1362,27 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li><code>unpivot()</code>: Transforms a pivot table into a flat table (implemented by a <code>tibble</code>). An additional column with page information can be included. <code>NA</code> values can be excluded from the array of values. Example:</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>ft_tmp &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unpivot</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>ft_tmp &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unpivot</span>()</span></code></pre></div>
 </div>
 <div id="generation-from-a-list-of-pivot-tables" class="section level3">
 <h3>Generation from a list of pivot tables</h3>
 <ul>
 <li><code>flatten_table_list()</code>: Given a list of <code>pivot_table</code> objects and a transformation function that flattens a <code>pivot_table</code> object, transforms each table using the function and merges the results into a flat table. Example:</li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
-<span id="cb20-2"><a href="#cb20-2"></a>  pt <span class="op">%&gt;%</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb20-4"><a href="#cb20-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb20-5"><a href="#cb20-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb20-6"><a href="#cb20-6"></a><span class="st">    </span><span class="kw">fill_labels</span>() <span class="op">%&gt;%</span></span>
-<span id="cb20-7"><a href="#cb20-7"></a><span class="st">    </span><span class="kw">remove_agg</span>() <span class="op">%&gt;%</span></span>
-<span id="cb20-8"><a href="#cb20-8"></a><span class="st">    </span><span class="kw">fill_values</span>() <span class="op">%&gt;%</span></span>
-<span id="cb20-9"><a href="#cb20-9"></a><span class="st">    </span><span class="kw">remove_k</span>() <span class="op">%&gt;%</span></span>
-<span id="cb20-10"><a href="#cb20-10"></a><span class="st">    </span><span class="kw">replace_dec</span>() <span class="op">%&gt;%</span></span>
-<span id="cb20-11"><a href="#cb20-11"></a><span class="st">    </span><span class="kw">unpivot</span>()</span>
-<span id="cb20-12"><a href="#cb20-12"></a>}</span>
-<span id="cb20-13"><a href="#cb20-13"></a></span>
-<span id="cb20-14"><a href="#cb20-14"></a>ft &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, f)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
+<span id="cb23-2"><a href="#cb23-2"></a>  pt <span class="op">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb23-6"><a href="#cb23-6"></a><span class="st">    </span><span class="kw">fill_labels</span>() <span class="op">%&gt;%</span></span>
+<span id="cb23-7"><a href="#cb23-7"></a><span class="st">    </span><span class="kw">remove_agg</span>() <span class="op">%&gt;%</span></span>
+<span id="cb23-8"><a href="#cb23-8"></a><span class="st">    </span><span class="kw">fill_values</span>() <span class="op">%&gt;%</span></span>
+<span id="cb23-9"><a href="#cb23-9"></a><span class="st">    </span><span class="kw">remove_k</span>() <span class="op">%&gt;%</span></span>
+<span id="cb23-10"><a href="#cb23-10"></a><span class="st">    </span><span class="kw">replace_dec</span>() <span class="op">%&gt;%</span></span>
+<span id="cb23-11"><a href="#cb23-11"></a><span class="st">    </span><span class="kw">unpivot</span>()</span>
+<span id="cb23-12"><a href="#cb23-12"></a>}</span>
+<span id="cb23-13"><a href="#cb23-13"></a></span>
+<span id="cb23-14"><a href="#cb23-14"></a>ft &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, f)</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1381,26 +1396,26 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li><code>tidyr::pivot_wider()</code>: It is needed when an observation is distributed among several rows. One column contains the name of the observation variables and another contains the values. In the example, we had a pivot table for each variable. The variable name is in <code>page</code> column. Example:</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) </span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) </span></code></pre></div>
 <ul>
 <li><code>dplyr::rename()</code>: It allows us to change the name of the columns of the flat table. Example:</li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) </span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) </span></code></pre></div>
 <ul>
 <li><code>dplyr::arrange()</code>: It allows us to order the rows of the flat table according to the selected columns. Example:</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D) </span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D) </span></code></pre></div>
 </div>
 <div id="alternative-transformations" class="section level2">
 <h2>Alternative transformations</h2>
 <p>We consider the same data from the illustrative example. This is not the case, but let us suppose a situation in which the transformations cannot be performed on the pivot table (because its structure does not coincide with the assumptions of the operations).</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>pt &lt;-<span class="st"> </span>list_pt_ie[[<span class="dv">1</span>]]</span>
-<span id="cb24-2"><a href="#cb24-2"></a></span>
-<span id="cb24-3"><a href="#cb24-3"></a>ft_at &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span></span>
-<span id="cb24-4"><a href="#cb24-4"></a><span class="st">  </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb24-5"><a href="#cb24-5"></a><span class="st">  </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb24-6"><a href="#cb24-6"></a><span class="st">  </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb24-7"><a href="#cb24-7"></a><span class="st">  </span><span class="kw">unpivot</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>pt &lt;-<span class="st"> </span>list_pt_ie[[<span class="dv">1</span>]]</span>
+<span id="cb27-2"><a href="#cb27-2"></a></span>
+<span id="cb27-3"><a href="#cb27-3"></a>ft_at &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="st">  </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a><span class="st">  </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
+<span id="cb27-6"><a href="#cb27-6"></a><span class="st">  </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb27-7"><a href="#cb27-7"></a><span class="st">  </span><span class="kw">unpivot</span>()</span></code></pre></div>
 <p>The only operations we perform are those for defining the pivot table and generating the flat table. The result obtained is shown below.</p>
 <table style="width:85%;">
 <colgroup>
@@ -1932,39 +1947,39 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li><code>dplyr::mutate_all()</code>: Apply the indicated function to all the columns of the table. We replace empty strings with <code>NA</code>. Example:</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate_all</span>( <span class="op">~</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">na_if</span>(., <span class="st">&quot;&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate_all</span>( <span class="op">~</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">na_if</span>(., <span class="st">&quot;&quot;</span>))</span></code></pre></div>
 <ul>
 <li><code>tidyr::fill()</code>: Fill in the missing values for the columns. The filling direction can be indicated. Example:</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw">fill</span>(col1, row1)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw">fill</span>(col1, row1)</span></code></pre></div>
 <ul>
 <li><code>dplyr::filter()</code>: Subset the table, retaining all rows that satisfy the condition. We remove the aggregates (label of the row or column closest to the array of values is empty) and <code>NA</code> values in the array of values. Example:</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(col2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(row2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(value))</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(col2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(row2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(value))</span></code></pre></div>
 <ul>
 <li><code>dplyr::mutate_at()</code>: Apply the indicated function to some of the columns of the table. We remove the thousands indicators and change the decimal indicator. Example:</li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb28-2"><a href="#cb28-2"></a>                                    <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(., <span class="dt">pattern =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb28-3"><a href="#cb28-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb28-4"><a href="#cb28-4"></a>                   <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace</span>(., <span class="dt">pattern =</span> <span class="st">&quot;,&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
+<span id="cb31-2"><a href="#cb31-2"></a>                                    <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(., <span class="dt">pattern =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
+<span id="cb31-4"><a href="#cb31-4"></a>                   <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace</span>(., <span class="dt">pattern =</span> <span class="st">&quot;,&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>))</span></code></pre></div>
 <p>As in the previous case, they can be combined to define a function and apply the transformations to all the objects in a list.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>g &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
-<span id="cb29-2"><a href="#cb29-2"></a>  pt <span class="op">%&gt;%</span></span>
-<span id="cb29-3"><a href="#cb29-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb29-4"><a href="#cb29-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb29-5"><a href="#cb29-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb29-6"><a href="#cb29-6"></a><span class="st">    </span><span class="kw">unpivot</span>() <span class="op">%&gt;%</span></span>
-<span id="cb29-7"><a href="#cb29-7"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_all</span>(<span class="op">~</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">na_if</span>(., <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb29-8"><a href="#cb29-8"></a><span class="st">    </span>tidyr<span class="op">::</span><span class="kw">fill</span>(col1, row1) <span class="op">%&gt;%</span></span>
-<span id="cb29-9"><a href="#cb29-9"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(col2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(row2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(value)) <span class="op">%&gt;%</span></span>
-<span id="cb29-10"><a href="#cb29-10"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb29-11"><a href="#cb29-11"></a>                     <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(., <span class="dt">pattern =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb29-12"><a href="#cb29-12"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb29-13"><a href="#cb29-13"></a>                     <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace</span>(., <span class="dt">pattern =</span> <span class="st">&quot;,&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>))</span>
-<span id="cb29-14"><a href="#cb29-14"></a>}</span>
-<span id="cb29-15"><a href="#cb29-15"></a></span>
-<span id="cb29-16"><a href="#cb29-16"></a>ft2 &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, g)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>g &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
+<span id="cb32-2"><a href="#cb32-2"></a>  pt <span class="op">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
+<span id="cb32-5"><a href="#cb32-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb32-6"><a href="#cb32-6"></a><span class="st">    </span><span class="kw">unpivot</span>() <span class="op">%&gt;%</span></span>
+<span id="cb32-7"><a href="#cb32-7"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_all</span>(<span class="op">~</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">na_if</span>(., <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb32-8"><a href="#cb32-8"></a><span class="st">    </span>tidyr<span class="op">::</span><span class="kw">fill</span>(col1, row1) <span class="op">%&gt;%</span></span>
+<span id="cb32-9"><a href="#cb32-9"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(col2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(row2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(value)) <span class="op">%&gt;%</span></span>
+<span id="cb32-10"><a href="#cb32-10"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
+<span id="cb32-11"><a href="#cb32-11"></a>                     <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(., <span class="dt">pattern =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb32-12"><a href="#cb32-12"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
+<span id="cb32-13"><a href="#cb32-13"></a>                     <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace</span>(., <span class="dt">pattern =</span> <span class="st">&quot;,&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>))</span>
+<span id="cb32-14"><a href="#cb32-14"></a>}</span>
+<span id="cb32-15"><a href="#cb32-15"></a></span>
+<span id="cb32-16"><a href="#cb32-16"></a>ft2 &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, g)</span></code></pre></div>
 <p>The result coincides with the one previously obtained. Below is a sample.</p>
 <table style="width:62%;">
 <colgroup>
@@ -1991,58 +2006,66 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">a1</td>
 <td align="center">b1</td>
 <td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.99</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
 <td align="center">d2</td>
 <td align="center">1.02</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center">M1</td>
 <td align="center">a1</td>
 <td align="center">b2</td>
-<td align="center">e2</td>
+<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">5.55</td>
+<td align="center">3.89</td>
+</tr>
+<tr class="odd">
+<td align="center">M1</td>
+<td align="center">a1</td>
+<td align="center">b3</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">2.33</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
+<td align="center">a1</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">5.62</td>
+<td align="center">1.87</td>
 </tr>
 <tr class="odd">
 <td align="center">M1</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
-<td align="center">e1</td>
+<td align="center">e2</td>
 <td align="center">d2</td>
-<td align="center">1.94</td>
+<td align="center">2.13</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
 <td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
+<td align="center">b3</td>
+<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">4.78</td>
+<td align="center">5.36</td>
 </tr>
 <tr class="odd">
+<td align="center">M1</td>
+<td align="center">a2</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
+<td align="center">d2</td>
+<td align="center">1.78</td>
+</tr>
+<tr class="even">
 <td align="center">M2</td>
 <td align="center">a1</td>
 <td align="center">b1</td>
-<td align="center">e2</td>
+<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">31</td>
+<td align="center">12</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center">M2</td>
 <td align="center">a1</td>
 <td align="center">b1</td>
@@ -2050,47 +2073,63 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d2</td>
 <td align="center">7</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center">M2</td>
 <td align="center">a1</td>
 <td align="center">b2</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">37</td>
+<td align="center">d1</td>
+<td align="center">26</td>
+</tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">a1</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">28</td>
 </tr>
 <tr class="even">
 <td align="center">M2</td>
 <td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">5</td>
+<td align="center">b1</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">50</td>
 </tr>
 <tr class="odd">
+<td align="center">M2</td>
+<td align="center">a2</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
+<td align="center">d2</td>
+<td align="center">13</td>
+</tr>
+<tr class="even">
 <td align="center">M3</td>
 <td align="center">a1</td>
 <td align="center">b1</td>
-<td align="center">e1</td>
+<td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">35.88</td>
-</tr>
-<tr class="even">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">111.70</td>
+<td align="center">64.88</td>
 </tr>
 <tr class="odd">
 <td align="center">M3</td>
 <td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
+<td align="center">b1</td>
+<td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">14.70</td>
+<td align="center">44.62</td>
 </tr>
 <tr class="even">
+<td align="center">M3</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">74.62</td>
+</tr>
+<tr class="odd">
 <td align="center">M3</td>
 <td align="center">a2</td>
 <td align="center">b3</td>
@@ -2098,53 +2137,29 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d1</td>
 <td align="center">70.32</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center">M3</td>
 <td align="center">a2</td>
 <td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">23.14</td>
-</tr>
-<tr class="even">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
 <td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">442.52</td>
+<td align="center">d2</td>
+<td align="center">71.52</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1034.02</td>
-</tr>
-<tr class="even">
-<td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">1561.52</td>
-</tr>
-<tr class="odd">
-<td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">85.26</td>
+<td align="center">3533.70</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
 <td align="center">a2</td>
-<td align="center">b3</td>
+<td align="center">b2</td>
 <td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">1135.90</td>
+<td align="center">687.32</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
@@ -2157,10 +2172,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 <p>Finally, below you can see all the data once transformed.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>t2 &lt;-<span class="st"> </span>ft2 <span class="op">%&gt;%</span></span>
-<span id="cb30-2"><a href="#cb30-2"></a><span class="st">  </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) <span class="op">%&gt;%</span></span>
-<span id="cb30-3"><a href="#cb30-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb30-4"><a href="#cb30-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>t2 &lt;-<span class="st"> </span>ft2 <span class="op">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2"></a><span class="st">  </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) <span class="op">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb33-4"><a href="#cb33-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D)</span></code></pre></div>
 <table style="width:71%;">
 <colgroup>
 <col width="6%"></col>

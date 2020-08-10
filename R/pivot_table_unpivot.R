@@ -1,6 +1,6 @@
 #' Unpivot a pivot table
 #'
-#' Transforms a pivot table into a flat table (implemented by a tibble). An
+#' Transforms a pivot table into a flat table (implemented by a `tibble`). An
 #' additional column with page information can be included. NA values can be
 #' excluded from the array of values.
 #'
@@ -11,15 +11,16 @@
 #' contain labels must be defined, and the table must only contain the pivot
 #' table rows and columns.
 #'
-#' @param pt A pivot_table object.
+#' @param pt A `pivot_table` object.
 #' @param include_page A boolean, indicates whether a column with the page
 #'   information is included or not.
 #' @param na.rm A boolean, indicates whether NA values from the array of values
 #'   are removed or not.
 #'
-#' @return A tibble.
-#' @export
-#' @keywords internal
+#' @return A `tibble`.
+#'
+#' @family flat table generation functions
+#' @seealso
 #'
 #' @examples
 #' library(tidyr)
@@ -51,13 +52,12 @@
 #'   remove_agg() %>%
 #'   unpivot(include_page = FALSE, na.rm = FALSE)
 #'
+#' @export
 unpivot <- function(pt, include_page = TRUE, na.rm = TRUE) {
-  UseMethod("unpivot", pt)
+  UseMethod("unpivot")
 }
 
 #' @rdname unpivot
-#' @export unpivot.pivot_table
-#' @method unpivot pivot_table
 #' @export
 unpivot.pivot_table <- function(pt,
                                 include_page = TRUE,

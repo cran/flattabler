@@ -85,8 +85,20 @@ pander::pandoc.table(t)
 #  pt_set_v_ie <- read_text_file(file)
 
 ## ---- eval = FALSE------------------------------------------------------------
+#  file <- system.file("extdata", "excel/ine2871.xlsx", package = "flattabler")
+#  pt <- read_excel_sheet(file)
+
+## ---- eval = FALSE------------------------------------------------------------
 #  folder <- system.file("extdata", "csvfolder", package = "flattabler")
 #  lpt <- read_text_folder(folder)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  folder <- system.file("extdata", "excelfolder", package = "flattabler")
+#  lpt <- read_excel_folder(folder)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  file <- system.file("extdata", "excel/set_sheets.xlsx", package = "flattabler")
+#  lpt <- read_excel_file(file)
 
 ## ---- eval = FALSE------------------------------------------------------------
 #  file <- system.file("extdata", "csv/set_v_ie.csv", package = "flattabler")
