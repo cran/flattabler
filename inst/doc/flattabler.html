@@ -32,6 +32,54 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -780,18 +828,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">a1</td>
 <td align="center">b1</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.02</td>
+<td align="center">d1</td>
+<td align="center">2.99</td>
 </tr>
 <tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.32</td>
-</tr>
-<tr class="odd">
 <td align="center">M1</td>
 <td align="center">a1</td>
 <td align="center">b2</td>
@@ -799,21 +839,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d1</td>
 <td align="center">3.89</td>
 </tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">3.65</td>
-</tr>
 <tr class="odd">
 <td align="center">M1</td>
 <td align="center">a1</td>
 <td align="center">b3</td>
-<td align="center">e1</td>
+<td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">2.33</td>
+<td align="center">1.87</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
@@ -832,78 +864,86 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">1.94</td>
 </tr>
 <tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.78</td>
-</tr>
-<tr class="odd">
 <td align="center">M2</td>
 <td align="center">a1</td>
 <td align="center">b1</td>
-<td align="center">e2</td>
+<td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">7</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">28</td>
+<td align="center">12</td>
 </tr>
 <tr class="odd">
 <td align="center">M2</td>
-<td align="center">a2</td>
+<td align="center">a1</td>
 <td align="center">b3</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">24</td>
+<td align="center">d1</td>
+<td align="center">6</td>
 </tr>
 <tr class="even">
+<td align="center">M2</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e2</td>
+<td align="center">d2</td>
+<td align="center">5</td>
+</tr>
+<tr class="odd">
 <td align="center">M3</td>
 <td align="center">a1</td>
 <td align="center">b2</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">52.31</td>
-</tr>
-<tr class="odd">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">111.70</td>
+<td align="center">54.70</td>
 </tr>
 <tr class="even">
 <td align="center">M3</td>
 <td align="center">a2</td>
-<td align="center">b2</td>
+<td align="center">b1</td>
 <td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">70.78</td>
+<td align="center">44.62</td>
+</tr>
+<tr class="odd">
+<td align="center">M3</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">74.62</td>
+</tr>
+<tr class="even">
+<td align="center">M3</td>
+<td align="center">a2</td>
+<td align="center">b3</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">70.32</td>
+</tr>
+<tr class="odd">
+<td align="center">M3</td>
+<td align="center">a2</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">42.25</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">a1</td>
+<td align="center">b1</td>
+<td align="center">e2</td>
+<td align="center">d2</td>
+<td align="center">69.96</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
 <td align="center">a1</td>
 <td align="center">b2</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">964.57</td>
+<td align="center">d1</td>
+<td align="center">970.96</td>
 </tr>
 <tr class="even">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">93.20</td>
-</tr>
-<tr class="odd">
 <td align="center">M4</td>
 <td align="center">a1</td>
 <td align="center">b3</td>
@@ -911,15 +951,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d1</td>
 <td align="center">1473.56</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center">M4</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1034.02</td>
+<td align="center">d1</td>
+<td align="center">3533.70</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center">M4</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
@@ -927,21 +967,29 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d1</td>
 <td align="center">2455.20</td>
 </tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">687.32</td>
+</tr>
 <tr class="even">
+<td align="center">M4</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">1927.10</td>
+</tr>
+<tr class="odd">
 <td align="center">M4</td>
 <td align="center">a2</td>
 <td align="center">b2</td>
 <td align="center">e2</td>
 <td align="center">d2</td>
 <td align="center">85.26</td>
-</tr>
-<tr class="odd">
-<td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">307.94</td>
 </tr>
 </tbody>
 </table>
@@ -2004,26 +2052,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="center">M1</td>
 <td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.02</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
 <td align="center">b2</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
 <td align="center">3.89</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.33</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
@@ -2036,42 +2068,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="center">M1</td>
 <td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">2.13</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
 <td align="center">b3</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
 <td align="center">5.36</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.78</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">12</td>
-</tr>
-<tr class="odd">
-<td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">7</td>
 </tr>
 <tr class="even">
 <td align="center">M2</td>
@@ -2084,12 +2084,20 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="center">M2</td>
 <td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">28</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">37</td>
 </tr>
 <tr class="even">
+<td align="center">M2</td>
+<td align="center">a1</td>
+<td align="center">b3</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">6</td>
+</tr>
+<tr class="odd">
 <td align="center">M2</td>
 <td align="center">a2</td>
 <td align="center">b1</td>
@@ -2097,77 +2105,117 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center">d1</td>
 <td align="center">50</td>
 </tr>
+<tr class="even">
+<td align="center">M2</td>
+<td align="center">a2</td>
+<td align="center">b1</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">23</td>
+</tr>
 <tr class="odd">
 <td align="center">M2</td>
 <td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">42</td>
+</tr>
+<tr class="even">
+<td align="center">M2</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">13</td>
+<td align="center">18</td>
+</tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">33</td>
 </tr>
 <tr class="even">
 <td align="center">M3</td>
 <td align="center">a1</td>
-<td align="center">b1</td>
+<td align="center">b2</td>
 <td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">64.88</td>
+<td align="center">54.25</td>
 </tr>
 <tr class="odd">
 <td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">44.62</td>
+<td align="center">a1</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">52.36</td>
 </tr>
 <tr class="even">
 <td align="center">M3</td>
 <td align="center">a2</td>
 <td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">74.62</td>
-</tr>
-<tr class="odd">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">70.32</td>
-</tr>
-<tr class="even">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
 <td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">71.52</td>
+<td align="center">70.78</td>
 </tr>
 <tr class="odd">
-<td align="center">M4</td>
+<td align="center">M3</td>
 <td align="center">a2</td>
+<td align="center">b3</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">42.25</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">a1</td>
 <td align="center">b1</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">3533.70</td>
+<td align="center">442.52</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">a1</td>
+<td align="center">b1</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">150.96</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">a1</td>
+<td align="center">b1</td>
+<td align="center">e2</td>
+<td align="center">d1</td>
+<td align="center">1223.64</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">a1</td>
+<td align="center">b2</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">964.57</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
 <td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
+<td align="center">b1</td>
+<td align="center">e2</td>
 <td align="center">d2</td>
-<td align="center">687.32</td>
+<td align="center">553.80</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
 <td align="center">a2</td>
 <td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">307.94</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">1268.08</td>
 </tr>
 </tbody>
 </table>
