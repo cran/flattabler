@@ -4,231 +4,158 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----setup, echo = FALSE------------------------------------------------------
-library(flattabler)
-
 ## ---- results = "asis", echo = FALSE------------------------------------------
-pt <- list_pt_ie[[1]]
+pt <- flattabler::df_ex
 rownames(pt) <- sprintf("r%d",1:nrow(pt))
 colnames(pt) <- sprintf("c%d",1:ncol(pt))
-pander::pandoc.table(pt, split.table = Inf)
+pander::pandoc.table(pt, split.table = Inf, emphasize.italics.cols = 1:2, emphasize.italics.rows = 1:3)
 
-## ---- results = "asis", echo = FALSE------------------------------------------
-library(tidyr)
+## -----------------------------------------------------------------------------
+library(flattabler)
 
-ft <- pt %>%
-  set_page(1, 1) %>%
-  define_labels(n_col = 2, n_row = 2) %>%
-  remove_top(1) %>%
-  fill_labels() %>%
-  remove_agg() %>%
-  fill_values() %>%
-  remove_k() %>%
-  replace_dec() %>%
+ft <- pivot_table(df_ex) |>
+  set_page(1, 1) |>
+  remove_top(1) |>
+  define_labels(n_col = 2, n_row = 2) |>
+  fill_labels() |>
+  remove_agg() |>
+  fill_values() |>
+  remove_k() |>
+  replace_dec() |>
   unpivot()
 
+## ---- results = "asis", echo = FALSE------------------------------------------
 pander::pandoc.table(ft)
-
-## ---- eval = FALSE------------------------------------------------------------
-#  library(flattabler)
-#  library(tidyr)
-#  
-#  ft <- pt %>%
-#    set_page(1, 1) %>%
-#    define_labels(n_col = 2, n_row = 2) %>%
-#    remove_top(1) %>%
-#    fill_labels() %>%
-#    remove_agg() %>%
-#    fill_values() %>%
-#    remove_k() %>%
-#    replace_dec() %>%
-#    unpivot()
 
 ## -----------------------------------------------------------------------------
 f <- function(pt) {
-  pt %>%
-    set_page(1, 1) %>%
-    define_labels(n_col = 2, n_row = 2) %>%
-    remove_top(1) %>%
-    fill_labels() %>%
-    remove_agg() %>%
-    fill_values() %>%
-    remove_k() %>%
-    replace_dec() %>%
-    unpivot()
+  pt |>
+  set_page(1, 1) |>
+  remove_top(1) |>
+  define_labels(n_col = 2, n_row = 2) |>
+  fill_labels() |>
+  remove_agg() |>
+  fill_values() |>
+  remove_k() |>
+  replace_dec() |>
+  unpivot()
 }
 
-ft <- flatten_table_list(list_pt_ie, f)
+## -----------------------------------------------------------------------------
+folder <- system.file("extdata", "csvfolder", package = "flattabler")
+lpt <- read_text_folder(folder)
 
-## ---- echo = FALSE------------------------------------------------------------
-ft_sample <- dplyr::slice_sample(ft, prop = 0.25) %>% 
-    dplyr::arrange(page, col1, col2, row1, row2)
+class(lpt[[1]])
+
+## -----------------------------------------------------------------------------
+ftl <- flatten_table_list(lpt, f)
 
 ## ---- results = "asis", echo = FALSE------------------------------------------
+ft_sample <- dplyr::slice_sample(ftl, prop = 0.20) |> 
+    dplyr::arrange(page, col1, col2, row1, row2)
 pander::pandoc.table(ft_sample)
 
 ## -----------------------------------------------------------------------------
-t <- ft %>%
-  tidyr::pivot_wider(names_from = page, values_from = value) %>%
-  dplyr::rename(A = col1, B = col2, E = row1, D = row2) %>% 
-  dplyr::arrange(A, B, E, D)
+t <- ftl |>
+  tidyr::pivot_wider(names_from = page, values_from = value) |>
+  dplyr::rename(B = col1, A = col2, E = row1, D = row2) |> 
+  dplyr::select(A, B, D, E, M1, M2, M3, M4) |> 
+  dplyr::arrange(A, B, D, E)
 
 ## ---- results = "asis", echo = FALSE------------------------------------------
 pander::pandoc.table(t)
 
-## ---- eval = FALSE------------------------------------------------------------
-#  df <- data.frame(unclass(pt_m4)[c(1:7)])
-#  pt <- pivot_table(df, page = "M4")
+## -----------------------------------------------------------------------------
+pt <- pivot_table(df_ex)
 
-## ---- eval = FALSE------------------------------------------------------------
-#  file <- system.file("extdata", "csv/set_v_ie.csv", package = "flattabler")
-#  pt_set_v_ie <- read_text_file(file)
-
-## ---- eval = FALSE------------------------------------------------------------
-#  file <- system.file("extdata", "excel/ine2871.xlsx", package = "flattabler")
-#  pt <- read_excel_sheet(file)
-
-## ---- eval = FALSE------------------------------------------------------------
-#  folder <- system.file("extdata", "csvfolder", package = "flattabler")
-#  lpt <- read_text_folder(folder)
-
-## ---- eval = FALSE------------------------------------------------------------
-#  folder <- system.file("extdata", "excelfolder", package = "flattabler")
-#  lpt <- read_excel_folder(folder)
-
-## ---- eval = FALSE------------------------------------------------------------
-#  file <- system.file("extdata", "excel/set_sheets.xlsx", package = "flattabler")
-#  lpt <- read_excel_file(file)
-
-## ---- eval = FALSE------------------------------------------------------------
-#  file <- system.file("extdata", "csv/set_v_ie.csv", package = "flattabler")
-#  pt_set_v_ie <- read_text_file(file)
-#  
-#  pt_set_v_ie %>% view_table_attr()
-
-## ---- eval = FALSE------------------------------------------------------------
-#  list_pt_ie <- pt_set_v_ie %>% divide()
+pt <- pivot_table(df_ex, page = "M4")
 
 ## -----------------------------------------------------------------------------
-pt <- list_pt_ie[[1]]
-
-pt <- pt %>% set_page(1, 1)
-
-## -----------------------------------------------------------------------------
-pt <- pt %>% define_labels(n_col = 2, n_row = 2)
+file <- system.file("extdata", "csv/set_v_ie.csv", package = "flattabler")
+pt <- read_text_file(file, define_page = TRUE)
 
 ## -----------------------------------------------------------------------------
-pt <- pt %>% remove_top(1)
+file <- system.file("extdata", "excel/set_v.xlsx", package = "flattabler")
+pt <- read_excel_sheet(file, define_page = 3)
 
 ## -----------------------------------------------------------------------------
-pt <- pt %>% fill_labels()
+pt <- pivot_table(df_set_h_v)
+lpt <- pt |> divide()
 
 ## -----------------------------------------------------------------------------
-pt <- pt %>% remove_agg()
+folder <- system.file("extdata", "csvfolder", package = "flattabler")
+lpt <- read_text_folder(folder)
 
 ## -----------------------------------------------------------------------------
-pt2 <- pt_m4_compact %>%
-  extract_labels(col = 1, labels = c("b1", "b2", "b3", "b4", "Total general"))
+folder <- system.file("extdata", "excelfolder", package = "flattabler")
+lpt <- read_excel_folder(folder)
 
 ## -----------------------------------------------------------------------------
-df <- get_col_values(list_pt_compact, start_row = 4)
+file <- system.file("extdata", "excel/set_sheets.xlsx", package = "flattabler")
+lpt <- read_excel_file(file)
+
+## -----------------------------------------------------------------------------
+pt <- pt |> set_page(1, 1)
+
+## -----------------------------------------------------------------------------
+pt <- pt |> define_labels(n_col = 2, n_row = 2)
+
+## -----------------------------------------------------------------------------
+pt <- pt |> remove_top(1)
+
+## -----------------------------------------------------------------------------
+pt <- pt |> fill_labels()
+
+## -----------------------------------------------------------------------------
+pt <- pt |> remove_agg()
+
+## -----------------------------------------------------------------------------
+pt <- pivot_table(df_ex_compact) |>
+  extract_labels(col = 1,
+                 labels = c("b1", "b2", "b3", "b4", "Total general"))
+
+## -----------------------------------------------------------------------------
+file <- system.file("extdata", "csv/set_v_compact.csv", package = "flattabler")
+pt <- read_text_file(file)
+lpt <- pt |> divide()
+
+df <- get_col_values(lpt, start_row = 4)
 labels <- sort(unique(df$label))
 
 ## -----------------------------------------------------------------------------
-pt <- pt %>% fill_values()
+pt <- pt |> fill_values()
 
 ## -----------------------------------------------------------------------------
-pt <- pt %>% remove_k()
+pt <- pt |> remove_k()
 
 ## -----------------------------------------------------------------------------
-pt <- pt %>% replace_dec()
+pt <- pt |> replace_dec()
 
 ## -----------------------------------------------------------------------------
-ft_tmp <- pt %>% unpivot()
+ft <- pivot_table(df_ex) |>
+  set_page(1, 1) |>
+  remove_top(1) |>
+  define_labels(n_col = 2, n_row = 2) |>
+  fill_labels() |>
+  remove_agg() |>
+  fill_values() |>
+  remove_k() |>
+  replace_dec() |>
+  unpivot()
 
 ## -----------------------------------------------------------------------------
 f <- function(pt) {
-  pt %>%
-    set_page(1, 1) %>%
-    define_labels(n_col = 2, n_row = 2) %>%
-    remove_top(1) %>%
-    fill_labels() %>%
-    remove_agg() %>%
-    fill_values() %>%
-    remove_k() %>%
-    replace_dec() %>%
+  pt |>
+    set_page(1, 1) |>
+    define_labels(n_col = 2, n_row = 2) |>
+    remove_top(1) |>
+    fill_labels() |>
+    remove_agg() |>
+    fill_values() |>
+    remove_k() |>
+    replace_dec() |>
     unpivot()
 }
 
-ft <- flatten_table_list(list_pt_ie, f)
-
-## -----------------------------------------------------------------------------
-ft <- ft %>% tidyr::pivot_wider(names_from = page, values_from = value) 
-
-## -----------------------------------------------------------------------------
-ft <- ft %>% dplyr::rename(A = col1, B = col2, E = row1, D = row2) 
-
-## -----------------------------------------------------------------------------
-ft <- ft %>% dplyr::arrange(A, B, E, D) 
-
-## -----------------------------------------------------------------------------
-pt <- list_pt_ie[[1]]
-
-ft_at <- pt %>%
-  set_page(1, 1) %>%
-  define_labels(n_col = 2, n_row = 2) %>%
-  remove_top(1) %>%
-  unpivot()
-
-## ---- results = "asis", echo = FALSE------------------------------------------
-pander::pandoc.table(ft_at)
-
-## -----------------------------------------------------------------------------
-ft_at <- ft_at %>% dplyr::mutate_all( ~ dplyr::na_if(., ""))
-
-## -----------------------------------------------------------------------------
-ft_at <- ft_at %>% tidyr::fill(col1, row1)
-
-## -----------------------------------------------------------------------------
-ft_at <- ft_at %>% dplyr::filter(!is.na(col2) & !is.na(row2) & !is.na(value))
-
-## -----------------------------------------------------------------------------
-ft_at <- ft_at %>% dplyr::mutate_at(c("value"),
-                                    ~ stringr::str_replace_all(., pattern = "\\.", replacement = "")) %>%
-  dplyr::mutate_at(c("value"),
-                   ~ stringr::str_replace(., pattern = ",", replacement = "\\."))
-
-## -----------------------------------------------------------------------------
-g <- function(pt) {
-  pt %>%
-    set_page(1, 1) %>%
-    define_labels(n_col = 2, n_row = 2) %>%
-    remove_top(1) %>%
-    unpivot() %>%
-    dplyr::mutate_all(~ dplyr::na_if(., "")) %>%
-    tidyr::fill(col1, row1) %>%
-    dplyr::filter(!is.na(col2) & !is.na(row2) & !is.na(value)) %>%
-    dplyr::mutate_at(c("value"),
-                     ~ stringr::str_replace_all(., pattern = "\\.", replacement = "")) %>%
-    dplyr::mutate_at(c("value"),
-                     ~ stringr::str_replace(., pattern = ",", replacement = "\\."))
-}
-
-ft2 <- flatten_table_list(list_pt_ie, g)
-
-## ---- echo = FALSE------------------------------------------------------------
-ft_sample2 <- dplyr::slice_sample(ft2, prop = 0.25) %>% 
-    dplyr::arrange(page, col1, col2, row1, row2)
-
-## ---- results = "asis", echo = FALSE------------------------------------------
-pander::pandoc.table(ft_sample2)
-
-## -----------------------------------------------------------------------------
-t2 <- ft2 %>%
-  tidyr::pivot_wider(names_from = page, values_from = value) %>%
-  dplyr::rename(A = col1, B = col2, E = row1, D = row2) %>% 
-  dplyr::arrange(A, B, E, D)
-
-## ---- results = "asis", echo = FALSE------------------------------------------
-pander::pandoc.table(t2)
+ft <- flatten_table_list(lpt, f)
 

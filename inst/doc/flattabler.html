@@ -12,142 +12,107 @@
 
 <meta name="author" content="Jose Samos (jsamos@ugr.es)" />
 
-<meta name="date" content="2020-06-20" />
+<meta name="date" content="2023-08-08" />
 
-<title>flattabler: Obtaining a Flat Table from Pivot Tables</title>
+<title>Transforming a pivot table into a flat table with the flattabler package</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
+
 <style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
 </style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
-  }
 
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
-});
-</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
-
-
-<style type="text/css">code{white-space: pre;}</style>
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -156,13 +121,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -170,6 +142,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -365,37 +338,55 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">flattabler: Obtaining a Flat Table from Pivot Tables</h1>
+<h1 class="title toc-ignore">Transforming a pivot table into a flat
+table with the flattabler package</h1>
 <h4 class="author">Jose Samos (<a href="mailto:jsamos@ugr.es" class="email">jsamos@ugr.es</a>)</h4>
-<h4 class="date">2020-06-20</h4>
+<h4 class="date">2023-08-08</h4>
 
 
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Pivot tables are generally used to present raw and summary data. They are generated from spreadsheets and, more recently, also from R (<a href="https://CRAN.R-project.org/package=pivottabler"><code>pivottabler</code></a>).</p>
-<p>If we generate pivot tables from our own data, <code>flattabler</code> package is not necessary. But, if we get data in pivot table format and need to represent or analyse it using another tool, this package can be very helpful: It can save us several hours of programming or manual transformation.</p>
-<p><code>flattabler</code> package offers a set of operations that allow us to transform one or more pivot tables into a flat table.</p>
-<p>The rest of this document is structured as follows: First, an illustrative example of transforming a pivot table into a flat table is presented. Then, the operations available in <code>flattabler</code> package, classified according to their purpose, are presented. In addition, transformations that can be carried out on a flat table are presented: they are not supported by package <code>flattabler</code> but are alternative or complementary to those of the package, so they are shown here. Finally, the document ends with the conclusions section.</p>
+<p>Pivot tables are generally used to present raw and summary data. They
+are generated from spreadsheets and, more recently, also from R (<a href="https://CRAN.R-project.org/package=pivottabler"><code>pivottabler</code></a>).</p>
+<p>If we generate pivot tables from our own data,
+<code>flattabler</code> package is not necessary. But, if we get data in
+pivot table format and need to represent or analyse it using another
+tool, this package can be very helpful: It can save us several hours of
+programming or manual transformation.</p>
+<p><code>flattabler</code> package offers a set of operations that allow
+us to transform one or more pivot tables into a flat table.</p>
+<p>The rest of this document is structured as follows: First, an
+illustrative example of transforming a pivot table into a flat table is
+presented. Then, the operations available in <code>flattabler</code>
+package, classified according to their purpose, are presented. Finally,
+the document ends with the conclusions section.</p>
 </div>
 <div id="an-illustrative-example" class="section level1">
 <h1>An illustrative example</h1>
-<p>In this example, given a pivot table and the flat table obtained from it, the transformations performed are presented. Next, a function is defined that groups these transformations. This function is applied to a list of pivot tables to obtain a single flat table. Finally, it is shown how the flat table can be modified using functions from <code>tidyverse</code> package components.</p>
+<p>In this example, given a pivot table and the flat table obtained from
+it, the transformations performed are presented. Next, a function is
+defined that groups these transformations. This function is applied to a
+list of pivot tables to obtain a single flat table. Finally, it is shown
+how the flat table can be modified using functions from <a href="https://CRAN.R-project.org/package=tidyverse"><code>tidyverse</code></a>
+package components.</p>
 <div id="pivot-table" class="section level2">
 <h2>Pivot table</h2>
-<p>A pivot table contains label rows and columns, and an array of values, usually numeric data. It can contain additional information, such as table header or footer.</p>
+<p>A <em>pivot table</em> allows to represent information in a
+structured way, mainly to be analysed by a person or to make a graphical
+representation of it. In addition to a header and/or footer, it contains
+label rows and columns, and a matrix of values, usually numeric
+data.</p>
 <table>
 <colgroup>
-<col width="10%"></col>
-<col width="16%"></col>
-<col width="5%"></col>
-<col width="8%"></col>
-<col width="8%"></col>
-<col width="11%"></col>
-<col width="8%"></col>
-<col width="7%"></col>
-<col width="11%"></col>
-<col width="16%"></col>
+<col width="9%" />
+<col width="17%" />
+<col width="7%" />
+<col width="11%" />
+<col width="11%" />
+<col width="10%" />
+<col width="12%" />
+<col width="17%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -407,19 +398,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <th align="center">c5</th>
 <th align="center">c6</th>
 <th align="center">c7</th>
-<th align="center">c8</th>
-<th align="center">c9</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="center"><strong>r1</strong></td>
-<td align="center">M1</td>
+<td align="center"><em>M4</em></td>
 <td align="center"></td>
-<td align="center">E</td>
-<td align="center">D</td>
-<td align="center"></td>
-<td align="center"></td>
+<td align="center"><em>E</em></td>
+<td align="center"><em>D</em></td>
 <td align="center"></td>
 <td align="center"></td>
 <td align="center"></td>
@@ -428,150 +415,800 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="center"><strong>r2</strong></td>
 <td align="center"></td>
 <td align="center"></td>
-<td align="center">e1</td>
+<td align="center"><em>e2</em></td>
 <td align="center"></td>
-<td align="center">Total e1</td>
-<td align="center">e2</td>
 <td align="center"></td>
-<td align="center">Total e2</td>
-<td align="center">Total general</td>
+<td align="center"><em>Total e2</em></td>
+<td align="center"><em>Total general</em></td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>r3</strong></td>
-<td align="center">A</td>
-<td align="center">B</td>
-<td align="center">d1</td>
-<td align="center">d2</td>
-<td align="center"></td>
-<td align="center">d1</td>
-<td align="center">d2</td>
+<td align="center"><em>B</em></td>
+<td align="center"><em>A</em></td>
+<td align="center"><em>d3</em></td>
+<td align="center"><em>d4</em></td>
+<td align="center"><em>d5</em></td>
 <td align="center"></td>
 <td align="center"></td>
 </tr>
 <tr class="even">
 <td align="center"><strong>r4</strong></td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">2,99</td>
-<td align="center">1,02</td>
-<td align="center">4,01</td>
-<td align="center">4,06</td>
-<td align="center">1,32</td>
-<td align="center">5,38</td>
-<td align="center">9,39</td>
+<td align="center"><em>b1</em></td>
+<td align="center"><em>a05</em></td>
+<td align="center">70,40</td>
+<td align="center">1.089,00</td>
+<td align="center"></td>
+<td align="center">1.159,40</td>
+<td align="center">1.159,40</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>r5</strong></td>
 <td align="center"></td>
-<td align="center">b2</td>
-<td align="center">3,89</td>
-<td align="center">3,65</td>
-<td align="center">7,54</td>
-<td align="center">5,55</td>
+<td align="center"><em>a09</em></td>
+<td align="center">674,31</td>
 <td align="center"></td>
-<td align="center">5,55</td>
-<td align="center">13,09</td>
+<td align="center"></td>
+<td align="center">674,31</td>
+<td align="center">674,31</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>r6</strong></td>
 <td align="center"></td>
-<td align="center">b3</td>
-<td align="center">2,33</td>
-<td align="center"></td>
-<td align="center">2,33</td>
-<td align="center">1,87</td>
-<td align="center"></td>
-<td align="center">1,87</td>
-<td align="center">4,2</td>
+<td align="center"><em>a13</em></td>
+<td align="center">421,08</td>
+<td align="center">1.055,12</td>
+<td align="center">64,68</td>
+<td align="center">1.540,88</td>
+<td align="center">1.540,88</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>r7</strong></td>
-<td align="center">Total a1</td>
 <td align="center"></td>
-<td align="center">9,21</td>
-<td align="center">4,67</td>
-<td align="center">13,88</td>
-<td align="center">11,48</td>
-<td align="center">1,32</td>
-<td align="center">12,8</td>
-<td align="center">26,68</td>
+<td align="center"><em>a17</em></td>
+<td align="center">96,00</td>
+<td align="center">1.347,84</td>
+<td align="center">545,28</td>
+<td align="center">1.989,12</td>
+<td align="center">1.989,12</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>r8</strong></td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">5,62</td>
-<td align="center">1,94</td>
-<td align="center">7,56</td>
-<td align="center">4,59</td>
-<td align="center">2,13</td>
-<td align="center">6,72</td>
-<td align="center">14,28</td>
+<td align="center"><em>Total b1</em></td>
+<td align="center"></td>
+<td align="center">1.261,79</td>
+<td align="center">3.491,96</td>
+<td align="center">609,96</td>
+<td align="center">5.363,71</td>
+<td align="center">5.363,71</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>r9</strong></td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">3,82</td>
-<td align="center">7,72</td>
-<td align="center">11,54</td>
-<td align="center">4,78</td>
-<td align="center">2,94</td>
-<td align="center">7,72</td>
-<td align="center">19,26</td>
+<td align="center"><em>b2</em></td>
+<td align="center"><em>a02</em></td>
+<td align="center">924,80</td>
+<td align="center">1.867,02</td>
+<td align="center">73,50</td>
+<td align="center">2.865,32</td>
+<td align="center">2.865,32</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>r10</strong></td>
 <td align="center"></td>
-<td align="center">b3</td>
-<td align="center">5,36</td>
-<td align="center">6,38</td>
-<td align="center">11,74</td>
-<td align="center">1,69</td>
-<td align="center">1,78</td>
-<td align="center">3,47</td>
-<td align="center">15,21</td>
+<td align="center"><em>a06</em></td>
+<td align="center">1.058,40</td>
+<td align="center">494,19</td>
+<td align="center">139,65</td>
+<td align="center">1.692,24</td>
+<td align="center">1.692,24</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>r11</strong></td>
-<td align="center">Total a2</td>
 <td align="center"></td>
-<td align="center">14,8</td>
-<td align="center">16,04</td>
-<td align="center">30,84</td>
-<td align="center">11,06</td>
-<td align="center">6,85</td>
-<td align="center">17,91</td>
-<td align="center">48,75</td>
+<td align="center"><em>a10</em></td>
+<td align="center">791,04</td>
+<td align="center">121,03</td>
+<td align="center"></td>
+<td align="center">912,07</td>
+<td align="center">912,07</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>r12</strong></td>
-<td align="center">Total general</td>
 <td align="center"></td>
-<td align="center">24,01</td>
-<td align="center">20,71</td>
-<td align="center">44,72</td>
-<td align="center">22,54</td>
-<td align="center">8,17</td>
-<td align="center">30,71</td>
-<td align="center">75,43</td>
+<td align="center"><em>a14</em></td>
+<td align="center">4.698,00</td>
+<td align="center">40,96</td>
+<td align="center"></td>
+<td align="center">4.738,96</td>
+<td align="center">4.738,96</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r13</strong></td>
+<td align="center"></td>
+<td align="center"><em>a18</em></td>
+<td align="center">150,00</td>
+<td align="center">443,52</td>
+<td align="center"></td>
+<td align="center">593,52</td>
+<td align="center">593,52</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r14</strong></td>
+<td align="center"><em>Total b2</em></td>
+<td align="center"></td>
+<td align="center">7.622,24</td>
+<td align="center">2.966,72</td>
+<td align="center">213,15</td>
+<td align="center">10.802,11</td>
+<td align="center">10.802,11</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r15</strong></td>
+<td align="center"><em>b3</em></td>
+<td align="center"><em>a03</em></td>
+<td align="center">658,56</td>
+<td align="center">203,52</td>
+<td align="center">148,48</td>
+<td align="center">1.010,56</td>
+<td align="center">1.010,56</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r16</strong></td>
+<td align="center"></td>
+<td align="center"><em>a07</em></td>
+<td align="center">92,00</td>
+<td align="center">1.466,08</td>
+<td align="center"></td>
+<td align="center">1.558,08</td>
+<td align="center">1.558,08</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r17</strong></td>
+<td align="center"></td>
+<td align="center"><em>a15</em></td>
+<td align="center">2.043,00</td>
+<td align="center">184,96</td>
+<td align="center">544,18</td>
+<td align="center">2.772,14</td>
+<td align="center">2.772,14</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r18</strong></td>
+<td align="center"></td>
+<td align="center"><em>a19</em></td>
+<td align="center">393,96</td>
+<td align="center">1.056,25</td>
+<td align="center"></td>
+<td align="center">1.450,21</td>
+<td align="center">1.450,21</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r19</strong></td>
+<td align="center"><em>Total b3</em></td>
+<td align="center"></td>
+<td align="center">3.187,52</td>
+<td align="center">2.910,81</td>
+<td align="center">692,66</td>
+<td align="center">6.790,99</td>
+<td align="center">6.790,99</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r20</strong></td>
+<td align="center"><em>b4</em></td>
+<td align="center"><em>a04</em></td>
+<td align="center">263,13</td>
+<td align="center">204,80</td>
+<td align="center">489,00</td>
+<td align="center">956,93</td>
+<td align="center">956,93</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r21</strong></td>
+<td align="center"></td>
+<td align="center"><em>a08</em></td>
+<td align="center">69,66</td>
+<td align="center">1.261,17</td>
+<td align="center">101,50</td>
+<td align="center">1.432,33</td>
+<td align="center">1.432,33</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r22</strong></td>
+<td align="center"></td>
+<td align="center"><em>a12</em></td>
+<td align="center">346,00</td>
+<td align="center">1.008,61</td>
+<td align="center">124,74</td>
+<td align="center">1.479,35</td>
+<td align="center">1.479,35</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r23</strong></td>
+<td align="center"></td>
+<td align="center"><em>a16</em></td>
+<td align="center">1.399,68</td>
+<td align="center">142,08</td>
+<td align="center">43,36</td>
+<td align="center">1.585,12</td>
+<td align="center">1.585,12</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r24</strong></td>
+<td align="center"></td>
+<td align="center"><em>a20</em></td>
+<td align="center">34,88</td>
+<td align="center">261,95</td>
+<td align="center">83,00</td>
+<td align="center">379,83</td>
+<td align="center">379,83</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>r25</strong></td>
+<td align="center"><em>Total b4</em></td>
+<td align="center"></td>
+<td align="center">2.113,35</td>
+<td align="center">2.878,61</td>
+<td align="center">841,60</td>
+<td align="center">5.833,56</td>
+<td align="center">5.833,56</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>r26</strong></td>
+<td align="center"><em>Total general</em></td>
+<td align="center"></td>
+<td align="center">14.184,90</td>
+<td align="center">12.248,10</td>
+<td align="center">2.357,37</td>
+<td align="center">28.790,37</td>
+<td align="center">28.790,37</td>
 </tr>
 </tbody>
 </table>
-<p>In the table above, columns <em>c1</em> and <em>c2</em> contain labels, also rows <em>r2</em> and <em>r3</em>. The header is made up of row <em>r1</em> and the intersection between rows and columns of labels (cells of <em>c1</em> and <em>c2</em> with <em>r2</em> and <em>r3</em>). Let us suppose that the content of the cell <em>(r1, c1)</em> is especially relevant because it serves to identify the content of this pivot table with respect to others.</p>
-<p>The matrix of values is made up of rows and columns after those containing labels (rows from <em>r4</em> on, and columns from <em>c3</em> on). Each value of this matrix is characterized by the combination of labels of the corresponding row and column. It is common to find null values in that matrix because the data is not produced or recorded for the combination of labels that define it.</p>
+<p>The table above, contained in the <code>df_ex</code> variable of the
+package, has the following parts:</p>
+<ul>
+<li><p>The <strong><em>header</em></strong> is made up of row
+<em>r1</em> and the intersection between rows and columns of labels
+(cells of <em>c1</em> and <em>c2</em> with <em>r2</em> and <em>r3</em>).
+Let us suppose that the content of the cell <em>(r1, c1)</em> is
+especially relevant, it is part of the table header and identifies the
+content of this pivot table with respect to others: It is the identifier
+of the <em>page</em>.</p></li>
+<li><p>Columns <em>c1</em> and <em>c2</em>, also rows <em>r2</em> and
+<em>r3</em>, contain <strong><em>labels</em></strong>, except those of
+the intersection that are part of the header. It is common to try not to
+repeat the values of the outer labels, it being understood that, if
+there is no value, the value of that position is the last one shown in
+the same row or column (this is the case in column <em>c1</em> and in
+row <em>r2</em>). In the innermost labels, if there are no values, it is
+because the corresponding position in the outer row or column
+corresponds to an aggregate (this is the case in column <em>c2</em> and
+in row <em>r3</em>).</p></li>
+<li><p>The <strong><em>matrix of values</em></strong> is made up of rows
+and columns after those containing labels (rows from <em>r4</em> on, and
+columns from <em>c3</em> on). Each value of this matrix is characterized
+by the combination of labels of the corresponding row and column. It is
+common to find null values in that matrix because the data is not
+produced or recorded for the combination of labels that define it, that
+is, the data is usually scattered. In addition to base data, aggregated
+data can be included in the matrix. Since it was intended for a person,
+the thousands separator had been used and, both this and the decimal
+separator, had been used with the Spanish style.</p></li>
+</ul>
 </div>
-<div id="flat-table" class="section level2">
-<h2>Flat table</h2>
-<p>A flat database or flat-file database is a database that only contains a single table. A flat table is a generally denormalized table that is not related to other tables.</p>
-<table style="width:60%;">
+<div id="obtaining-a-flat-table" class="section level2">
+<h2>Obtaining a flat table</h2>
+<p>A flat database or flat-file database is a database that only
+contains a single table. A <em>flat table</em> is a generally
+denormalized table that is not related to other tables. It is not
+necessarily tidy data (in the sense of the <a href="https://CRAN.R-project.org/package=tidyverse"><code>tidyverse</code></a>
+package) but in each column all the data must be of the same type, so
+that it can be easily stored in a RDBMS (<em>Relational Database
+Management System</em>).</p>
+<p>A pivot table is not a flat table, but from a pivot table we can
+obtain a flat table, that is what we are going to do with the help of
+the <code>flattabler</code> package. Below are the transformations
+performed using its functions.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(flattabler)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>ft <span class="ot">&lt;-</span> <span class="fu">pivot_table</span>(df_ex) <span class="sc">|&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="fu">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="fu">remove_top</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="fu">define_labels</span>(<span class="at">n_col =</span> <span class="dv">2</span>, <span class="at">n_row =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="fu">fill_labels</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="fu">remove_agg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="fu">fill_values</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="fu">remove_k</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="fu">replace_dec</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="fu">unpivot</span>()</span></code></pre></div>
+<p>Starting from the pivot table in the variable <code>df_ex</code>:</p>
+<ol style="list-style-type: decimal">
+<li><p>We get an object using the <code>pivot_table()</code> function,
+the constructor of the <code>pivot_table</code> class.</p></li>
+<li><p>We define that the value that identifies the pivot table (its
+page) is in cell <em>(r1, c1)</em>, by means of
+<code>set_page(1, 1)</code>.</p></li>
+<li><p>We should leave only the labels and the matrix of values,
+therefore rows or columns with other information have to be removed. The
+cells between the rows and columns of labels are ignored (cells of
+<em>c1</em> and <em>c2</em> with <em>r2</em> and <em>r3</em>). We delete
+the first row using <code>remove_top(1)</code> because it does not
+contain labels.</p></li>
+<li><p>Then, we define the number of rows and columns containing labels
+using <code>define_labels(n_col = 2, n_row = 2)</code>. There are two
+columns and two rows of labels.</p></li>
+<li><p>Since there are more than one row or column with labels, the
+values of the labels of the first row and column have not been repeated.
+They are filled using <code>fill_labels()</code>.</p></li>
+<li><p>The pivot table contains aggregated data. It is removed by
+<code>remove_agg()</code>. It is recognized exclusively because there
+are no values in the row or column of the labels next to the array of
+values.</p></li>
+<li><p>The array of values has gaps that, instead of having a numeric
+value, have an empty string. In R it is more appropriate to have
+<code>NA</code> if the data is not available. This operation is
+performed through <code>fill_values()</code>.</p></li>
+<li><p>The example is a Spanish report that uses thousands and decimal
+separators in the value matrix. We need to adapt them to the R syntax
+for numbers. This operation is carried out using <code>remove_k()</code>
+to remove the thousands separator and <code>replace_dec()</code> to
+replace the decimal separator.</p></li>
+<li><p>Finally, it is transformed into a flat table by
+<code>unpivot()</code>: each row corresponds to a value with its
+combination of labels. By default, <code>NA</code> values are not
+considered.</p></li>
+</ol>
+<p>The result obtained can be seen in the following table. An additional
+label has been added with the value that identifies the pivot table, the
+pivot table <em>page</em>.</p>
+<table style="width:62%;">
 <colgroup>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="11%"></col>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">page</th>
+<th align="center">col1</th>
+<th align="center">col2</th>
+<th align="center">row1</th>
+<th align="center">row2</th>
+<th align="center">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a05</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">70.40</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a05</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1089.00</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a09</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">674.31</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a13</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">421.08</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a13</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1055.12</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a13</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">64.68</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">96.00</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1347.84</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">545.28</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a02</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">924.80</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a02</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1867.02</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a02</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">73.50</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a06</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">1058.40</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a06</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">494.19</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a06</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">139.65</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a10</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">791.04</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a10</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">121.03</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a14</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">4698.00</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a14</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">40.96</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a18</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">150.00</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a18</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">443.52</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a03</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">658.56</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a03</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">203.52</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a03</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">148.48</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a07</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">92.00</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a07</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1466.08</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a15</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">2043.00</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a15</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">184.96</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a15</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">544.18</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a19</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">393.96</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b3</td>
+<td align="center">a19</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1056.25</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a04</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">263.13</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a04</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">204.80</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a04</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">489.00</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a08</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">69.66</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a08</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1261.17</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a08</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">101.50</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a12</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">346.00</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a12</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1008.61</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a12</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">124.74</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a16</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">1399.68</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a16</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">142.08</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a16</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">43.36</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a20</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">34.88</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a20</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">261.95</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a20</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">83.00</td>
+</tr>
+</tbody>
+</table>
+<p>Since this table is not intended to be analysed directly by a person,
+aggregated data has been removed as well as data that was not available
+for tag combinations (of course this is optional). The numerical data
+has been transformed so that it can be easily processed in R.</p>
+<p>The result of the transformations is a <code>tibble</code> that can
+be further transformed using the functions of the <a href="https://CRAN.R-project.org/package=tidyverse"><code>tidyverse</code></a>
+package.</p>
+</div>
+<div id="transforming-a-set-of-pivot-tables" class="section level2">
+<h2>Transforming a set of pivot tables</h2>
+<p>Once we have defined the necessary transformations for a pivot table,
+we can apply them to any other with the same structure. Candidate tables
+<strong>can have different number of rows or columns</strong>, depending
+on the number of labels, but they <strong>must have the same number of
+rows and columns of labels, and the same number of header or footer
+rows</strong>, so that the transformations are the same for each
+table.</p>
+<p>To easily perform this operation, we define a function <code>f</code>
+from the transformations, as shown below.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(pt) {</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  pt <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="fu">remove_top</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="fu">define_labels</span>(<span class="at">n_col =</span> <span class="dv">2</span>, <span class="at">n_row =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="fu">fill_labels</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="fu">remove_agg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="fu">fill_values</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="fu">remove_k</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="fu">replace_dec</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="fu">unpivot</span>()</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>}</span></code></pre></div>
+<p>The only difference from the original transformation is that we don’t
+need to build a <code>pivot_table</code> object because the input
+functions provided by the package build it automatically.</p>
+<p>The package has functions that allow data to be read in either text
+format or Excel format, from a single file or from a folder with
+multiple files. For example, the following code reads files in CSV
+format contained in a package data folder. The result is a list of
+<code>pivot_table</code> objects that can be directly transformed.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>folder <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csvfolder&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>lpt <span class="ot">&lt;-</span> <span class="fu">read_text_folder</span>(folder)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">class</span>(lpt[[<span class="dv">1</span>]])</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;pivot_table&quot;</span></span></code></pre></div>
+<p>Given a list of pivot tables, <code>lpt</code>,
+<code>flatten_table_list()</code> applies the transformation defined by
+function <code>f</code> to each of them, and merges the results into a
+flat table.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>ftl <span class="ot">&lt;-</span> <span class="fu">flatten_table_list</span>(lpt, f)</span></code></pre></div>
+<p>In this case, the full result is not shown in this document because
+it takes up too much space, but a sample is shown below.</p>
+<table style="width:62%;">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -586,438 +1223,352 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tbody>
 <tr class="odd">
 <td align="center">M1</td>
-<td align="center">a1</td>
 <td align="center">b1</td>
+<td align="center">a05</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">2.99</td>
+<td align="center">1.91</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
-<td align="center">a1</td>
 <td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.02</td>
+<td align="center">a05</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">1.10</td>
 </tr>
 <tr class="odd">
 <td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
+<td align="center">b4</td>
+<td align="center">a04</td>
+<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">4.06</td>
+<td align="center">1.84</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.32</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
+<td align="center">b4</td>
+<td align="center">a08</td>
 <td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.89</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">3.65</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">5.55</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.33</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.87</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.62</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.94</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.59</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">2.13</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.82</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">7.72</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.78</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">2.94</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.36</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">6.38</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
 <td align="center">d1</td>
 <td align="center">1.69</td>
 </tr>
 <tr class="odd">
 <td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
+<td align="center">b4</td>
+<td align="center">a08</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.78</td>
-</tr>
-</tbody>
-</table>
-<p>The table above is a flat table whose data has been obtained from the pivot table in the previous section. It only contains raw data and the labels that characterize it. An additional label has been added with the value that identifies the pivot table, the pivot table <em>page</em>. <code>NA</code> values have not been included. Aggregated data can be obtained from raw data.</p>
-</div>
-<div id="transforming-a-pivot-table" class="section level2">
-<h2>Transforming a pivot table</h2>
-<p>The transformation to obtain the flat table from the pivot table has been carried out using <code>flattabler</code> package. The code is shown below. For clarity, the pipe operator syntax provided by <code>tidyr</code> package has been used.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(flattabler)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(tidyr)</span>
-<span id="cb1-3"><a href="#cb1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4"></a>ft &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="st">  </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="st">  </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="st">  </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="st">  </span><span class="kw">fill_labels</span>() <span class="op">%&gt;%</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="st">  </span><span class="kw">remove_agg</span>() <span class="op">%&gt;%</span></span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="st">  </span><span class="kw">fill_values</span>() <span class="op">%&gt;%</span></span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="st">  </span><span class="kw">remove_k</span>() <span class="op">%&gt;%</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="st">  </span><span class="kw">replace_dec</span>() <span class="op">%&gt;%</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a><span class="st">  </span><span class="kw">unpivot</span>()</span></code></pre></div>
-<p>Starting from the pivot table <code>pt</code>:</p>
-<ol style="list-style-type: decimal">
-<li><p>We define that the value that identifies it (the pivot table page) is in cell <em>(r1, c1)</em>, by means of <code>set_page(1, 1)</code>.</p></li>
-<li><p>The pivot table only contains labels and values, therefore rows or columns with other information have to be removed. The cells between the rows and columns of labels can be ignored. We delete the first row using <code>remove_top(1)</code> because it does not contain labels.</p></li>
-<li><p>When we only have the cells of the pivot table, we define the number of rows and columns containing labels using <code>define_labels(n_col = 2, n_row = 2)</code>. There are two columns and two rows of labels.</p></li>
-<li><p>The example is a Spanish report that uses thousands and decimal separators in the value matrix. We need to adapt them to the R syntax for numbers. This operation is carried out using <code>remove_k()</code> to remove the thousands separator and <code>replace_dec()</code> to replace the decimal separator.</p></li>
-<li><p>The array of values has gaps that, instead of having a numeric value, have an empty string. In R it is more appropriate to have <code>NA</code> if the data is not available. This operation is performed through <code>fill_values()</code>.</p></li>
-<li><p>Since there are more than one row or column with labels, the values of the labels of the first row and column have not been repeated. They are filled using <code>fill_labels()</code>.</p></li>
-<li><p>The pivot table contains aggregated data that can be obtained from the raw data. It is removed by <code>remove_agg()</code>.</p></li>
-<li><p>Finally, it is transformed into a flat table by <code>unpivot()</code>: each row corresponds to a value with its combination of labels. <code>NA</code> values have not been considered.</p></li>
-</ol>
-</div>
-<div id="transforming-a-list-of-pivot-tables" class="section level2">
-<h2>Transforming a list of pivot tables</h2>
-<p>Once we have defined the necessary transformations for a pivot table, we can apply them to any other with the same structure. Candidate tables can have different number of rows or columns, depending on the number of labels, but they must have the same number of rows and columns of labels, and the same number of header or footer rows, so that the transformations are the same for each table.</p>
-<p>To easily perform this operation, we define a function <code>f</code> from the transformations, as shown below.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
-<span id="cb2-2"><a href="#cb2-2"></a>  pt <span class="op">%&gt;%</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="st">    </span><span class="kw">fill_labels</span>() <span class="op">%&gt;%</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="st">    </span><span class="kw">remove_agg</span>() <span class="op">%&gt;%</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="st">    </span><span class="kw">fill_values</span>() <span class="op">%&gt;%</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="st">    </span><span class="kw">remove_k</span>() <span class="op">%&gt;%</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="st">    </span><span class="kw">replace_dec</span>() <span class="op">%&gt;%</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="st">    </span><span class="kw">unpivot</span>()</span>
-<span id="cb2-12"><a href="#cb2-12"></a>}</span>
-<span id="cb2-13"><a href="#cb2-13"></a></span>
-<span id="cb2-14"><a href="#cb2-14"></a>ft &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, f)</span></code></pre></div>
-<p>Given a list of pivot tables, <code>list_pt_ie</code>, <code>flatten_table_list()</code> applies the transformation defined by <code>f</code> to each of them, and merges the results into a flat table. In this case, the full result is not shown in this document because it takes up too much space, but a sample is shown below.</p>
-<table style="width:62%;">
-<colgroup>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="13%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">page</th>
-<th align="center">col1</th>
-<th align="center">col2</th>
-<th align="center">row1</th>
-<th align="center">row2</th>
-<th align="center">value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.99</td>
+<td align="center">d4</td>
+<td align="center">1.73</td>
 </tr>
 <tr class="even">
 <td align="center">M1</td>
-<td align="center">a1</td>
+<td align="center">b4</td>
+<td align="center">a16</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">2.22</td>
+</tr>
+<tr class="odd">
+<td align="center">M1</td>
+<td align="center">b4</td>
+<td align="center">a16</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">2.71</td>
+</tr>
+<tr class="even">
+<td align="center">M1</td>
+<td align="center">b4</td>
+<td align="center">a20</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">2.70</td>
+</tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a05</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">41</td>
+</tr>
+<tr class="even">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a13</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">11</td>
+</tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">9</td>
+</tr>
+<tr class="even">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">23</td>
+</tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">5</td>
+</tr>
+<tr class="even">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">24</td>
+</tr>
+<tr class="odd">
+<td align="center">M2</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">16</td>
+</tr>
+<tr class="even">
+<td align="center">M2</td>
 <td align="center">b2</td>
+<td align="center">a10</td>
 <td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.89</td>
+<td align="center">d2</td>
+<td align="center">27</td>
 </tr>
 <tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
+<td align="center">M2</td>
+<td align="center">b2</td>
+<td align="center">a10</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.87</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.62</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.94</td>
+<td align="center">d3</td>
+<td align="center">16</td>
 </tr>
 <tr class="even">
 <td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
+<td align="center">b2</td>
+<td align="center">a14</td>
 <td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">12</td>
+<td align="center">8</td>
 </tr>
 <tr class="odd">
 <td align="center">M2</td>
-<td align="center">a1</td>
 <td align="center">b3</td>
+<td align="center">a07</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
 <td align="center">6</td>
 </tr>
 <tr class="even">
 <td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
+<td align="center">b4</td>
+<td align="center">a04</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">5</td>
+<td align="center">d4</td>
+<td align="center">8</td>
 </tr>
 <tr class="odd">
-<td align="center">M3</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">54.70</td>
+<td align="center">M2</td>
+<td align="center">b4</td>
+<td align="center">a16</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">4</td>
 </tr>
 <tr class="even">
 <td align="center">M3</td>
-<td align="center">a2</td>
 <td align="center">b1</td>
+<td align="center">a13</td>
 <td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">44.62</td>
+<td align="center">12.24</td>
 </tr>
 <tr class="odd">
 <td align="center">M3</td>
-<td align="center">a2</td>
 <td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">74.62</td>
+<td align="center">a02</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">45.10</td>
 </tr>
 <tr class="even">
 <td align="center">M3</td>
-<td align="center">a2</td>
+<td align="center">b2</td>
+<td align="center">a14</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">25.68</td>
+</tr>
+<tr class="odd">
+<td align="center">M3</td>
 <td align="center">b3</td>
+<td align="center">a07</td>
 <td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">70.32</td>
+<td align="center">13.98</td>
+</tr>
+<tr class="even">
+<td align="center">M3</td>
+<td align="center">b3</td>
+<td align="center">a11</td>
+<td align="center">e1</td>
+<td align="center">d1</td>
+<td align="center">23.17</td>
 </tr>
 <tr class="odd">
 <td align="center">M3</td>
-<td align="center">a2</td>
 <td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">42.25</td>
+<td align="center">a11</td>
+<td align="center">e1</td>
+<td align="center">d2</td>
+<td align="center">17.75</td>
 </tr>
 <tr class="even">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
+<td align="center">M3</td>
+<td align="center">b4</td>
+<td align="center">a04</td>
+<td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">69.96</td>
+<td align="center">24.16</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">970.96</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">1347.84</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
-<td align="center">a1</td>
+<td align="center">b1</td>
+<td align="center">a17</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">545.28</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a02</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">73.50</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a06</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">1058.40</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a06</td>
+<td align="center">e2</td>
+<td align="center">d4</td>
+<td align="center">494.19</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b2</td>
+<td align="center">a14</td>
+<td align="center">e2</td>
+<td align="center">d3</td>
+<td align="center">4698.00</td>
+</tr>
+<tr class="odd">
+<td align="center">M4</td>
 <td align="center">b3</td>
+<td align="center">a03</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1473.56</td>
-</tr>
-<tr class="odd">
-<td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3533.70</td>
+<td align="center">d5</td>
+<td align="center">148.48</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
+<td align="center">b3</td>
+<td align="center">a15</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">2455.20</td>
+<td align="center">d4</td>
+<td align="center">184.96</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">687.32</td>
+<td align="center">b3</td>
+<td align="center">a15</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">544.18</td>
 </tr>
 <tr class="even">
 <td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
+<td align="center">b4</td>
+<td align="center">a08</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1927.10</td>
+<td align="center">d3</td>
+<td align="center">69.66</td>
 </tr>
 <tr class="odd">
 <td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
+<td align="center">b4</td>
+<td align="center">a12</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">85.26</td>
+<td align="center">d3</td>
+<td align="center">346.00</td>
+</tr>
+<tr class="even">
+<td align="center">M4</td>
+<td align="center">b4</td>
+<td align="center">a12</td>
+<td align="center">e2</td>
+<td align="center">d5</td>
+<td align="center">124.74</td>
 </tr>
 </tbody>
 </table>
-</div>
-<div id="flat-table-transformation" class="section level2">
-<h2>Flat table transformation</h2>
-<p>Once we have a flat table, implemented using <code>tibble</code>, we can use <code>tidyverse</code> package components to transform it, as shown below. In this case all results are displayed.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>t &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="st">  </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) <span class="op">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D)</span></code></pre></div>
+<p>Once we have a flat table, implemented using <code>tibble</code>, we
+can use <a href="https://CRAN.R-project.org/package=tidyverse"><code>tidyverse</code></a>
+package components to transform it, as shown below. In this case all
+results are displayed.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>t <span class="ot">&lt;-</span> ftl <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> page, <span class="at">values_from =</span> value) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">B =</span> col1, <span class="at">A =</span> col2, <span class="at">E =</span> row1, <span class="at">D =</span> row2) <span class="sc">|&gt;</span> </span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(A, B, D, E, M1, M2, M3, M4) <span class="sc">|&gt;</span> </span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(A, B, D, E)</span></code></pre></div>
 <table style="width:71%;">
 <colgroup>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="9%"></col>
-<col width="6%"></col>
-<col width="12%"></col>
-<col width="13%"></col>
+<col width="8%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+<col width="9%" />
+<col width="6%" />
+<col width="11%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="center">A</th>
 <th align="center">B</th>
-<th align="center">E</th>
 <th align="center">D</th>
+<th align="center">E</th>
 <th align="center">M1</th>
 <th align="center">M2</th>
 <th align="center">M3</th>
@@ -1026,214 +1577,824 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">a1</td>
+<td align="center">a01</td>
 <td align="center">b1</td>
-<td align="center">e1</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">1.88</td>
+<td align="center">9</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a02</td>
+<td align="center">b2</td>
 <td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">10</td>
+<td align="center">25.60</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a02</td>
+<td align="center">b2</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">10</td>
+<td align="center">45.10</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a02</td>
+<td align="center">b2</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">34</td>
+<td align="center">NA</td>
+<td align="center">924.80</td>
+</tr>
+<tr class="odd">
+<td align="center">a02</td>
+<td align="center">b2</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">29</td>
+<td align="center">NA</td>
+<td align="center">1867.02</td>
+</tr>
+<tr class="even">
+<td align="center">a02</td>
+<td align="center">b2</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">5</td>
+<td align="center">NA</td>
+<td align="center">73.50</td>
+</tr>
+<tr class="odd">
+<td align="center">a03</td>
+<td align="center">b3</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">4</td>
+<td align="center">12.96</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a03</td>
+<td align="center">b3</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">10</td>
+<td align="center">26.70</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a03</td>
+<td align="center">b3</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">14</td>
+<td align="center">NA</td>
+<td align="center">658.56</td>
+</tr>
+<tr class="even">
+<td align="center">a03</td>
+<td align="center">b3</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">8</td>
+<td align="center">NA</td>
+<td align="center">203.52</td>
+</tr>
+<tr class="odd">
+<td align="center">a03</td>
+<td align="center">b3</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">8</td>
+<td align="center">NA</td>
+<td align="center">148.48</td>
+</tr>
+<tr class="even">
+<td align="center">a04</td>
+<td align="center">b4</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">1.84</td>
+<td align="center">9</td>
+<td align="center">16.56</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a04</td>
+<td align="center">b4</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">1.51</td>
+<td align="center">16</td>
+<td align="center">24.16</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a04</td>
+<td align="center">b4</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">5.37</td>
+<td align="center">7</td>
+<td align="center">NA</td>
+<td align="center">263.13</td>
+</tr>
+<tr class="odd">
+<td align="center">a04</td>
+<td align="center">b4</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">3.20</td>
+<td align="center">8</td>
+<td align="center">NA</td>
+<td align="center">204.80</td>
+</tr>
+<tr class="even">
+<td align="center">a04</td>
+<td align="center">b4</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">4.89</td>
+<td align="center">10</td>
+<td align="center">NA</td>
+<td align="center">489.00</td>
+</tr>
+<tr class="odd">
+<td align="center">a05</td>
+<td align="center">b1</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">1.91</td>
+<td align="center">41</td>
+<td align="center">78.31</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a05</td>
+<td align="center">b1</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">1.10</td>
+<td align="center">8</td>
+<td align="center">NA</td>
+<td align="center">70.40</td>
+</tr>
+<tr class="odd">
+<td align="center">a05</td>
+<td align="center">b1</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">2.25</td>
+<td align="center">22</td>
+<td align="center">NA</td>
+<td align="center">1089.00</td>
+</tr>
+<tr class="even">
+<td align="center">a06</td>
+<td align="center">b2</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">24</td>
+<td align="center">63.60</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a06</td>
+<td align="center">b2</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">15</td>
+<td align="center">30.30</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a06</td>
+<td align="center">b2</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">21</td>
+<td align="center">NA</td>
+<td align="center">1058.40</td>
+</tr>
+<tr class="odd">
+<td align="center">a06</td>
+<td align="center">b2</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">17</td>
+<td align="center">NA</td>
+<td align="center">494.19</td>
+</tr>
+<tr class="even">
+<td align="center">a06</td>
+<td align="center">b2</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">7</td>
+<td align="center">NA</td>
+<td align="center">139.65</td>
+</tr>
+<tr class="odd">
+<td align="center">a07</td>
+<td align="center">b3</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">6</td>
+<td align="center">13.98</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a07</td>
+<td align="center">b3</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">5</td>
+<td align="center">NA</td>
+<td align="center">92.00</td>
+</tr>
+<tr class="odd">
+<td align="center">a07</td>
+<td align="center">b3</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">28</td>
+<td align="center">NA</td>
+<td align="center">1466.08</td>
+</tr>
+<tr class="even">
+<td align="center">a08</td>
+<td align="center">b4</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">1.69</td>
+<td align="center">18</td>
+<td align="center">30.42</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a08</td>
+<td align="center">b4</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">1.01</td>
+<td align="center">15</td>
+<td align="center">15.15</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a08</td>
+<td align="center">b4</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">0.86</td>
+<td align="center">9</td>
+<td align="center">NA</td>
+<td align="center">69.66</td>
+</tr>
+<tr class="odd">
+<td align="center">a08</td>
+<td align="center">b4</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">1.73</td>
+<td align="center">27</td>
+<td align="center">NA</td>
+<td align="center">1261.17</td>
+</tr>
+<tr class="even">
+<td align="center">a08</td>
+<td align="center">b4</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">4.06</td>
+<td align="center">5</td>
+<td align="center">NA</td>
+<td align="center">101.50</td>
+</tr>
+<tr class="odd">
+<td align="center">a09</td>
+<td align="center">b1</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">2.55</td>
+<td align="center">16</td>
+<td align="center">40.80</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a09</td>
+<td align="center">b1</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">2.74</td>
+<td align="center">12</td>
+<td align="center">32.88</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a09</td>
+<td align="center">b1</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">3.99</td>
+<td align="center">13</td>
+<td align="center">NA</td>
+<td align="center">674.31</td>
+</tr>
+<tr class="even">
+<td align="center">a10</td>
+<td align="center">b2</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">6</td>
+<td align="center">9.90</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a10</td>
+<td align="center">b2</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">27</td>
+<td align="center">25.11</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a10</td>
+<td align="center">b2</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">16</td>
+<td align="center">NA</td>
+<td align="center">791.04</td>
+</tr>
+<tr class="odd">
+<td align="center">a10</td>
+<td align="center">b2</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">7</td>
+<td align="center">NA</td>
+<td align="center">121.03</td>
+</tr>
+<tr class="even">
+<td align="center">a11</td>
+<td align="center">b3</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">7</td>
+<td align="center">23.17</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a11</td>
+<td align="center">b3</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">5</td>
+<td align="center">17.75</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a11</td>
+<td align="center">b3</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">17</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a11</td>
+<td align="center">b3</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">13</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a12</td>
+<td align="center">b4</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">1.47</td>
+<td align="center">32</td>
+<td align="center">47.04</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a12</td>
+<td align="center">b4</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">3.46</td>
+<td align="center">10</td>
+<td align="center">NA</td>
+<td align="center">346.00</td>
+</tr>
+<tr class="even">
+<td align="center">a12</td>
+<td align="center">b4</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">3.49</td>
+<td align="center">17</td>
+<td align="center">NA</td>
+<td align="center">1008.61</td>
+</tr>
+<tr class="odd">
+<td align="center">a12</td>
+<td align="center">b4</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">1.54</td>
+<td align="center">9</td>
+<td align="center">NA</td>
+<td align="center">124.74</td>
+</tr>
+<tr class="even">
+<td align="center">a13</td>
+<td align="center">b1</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
 <td align="center">2.99</td>
 <td align="center">12</td>
 <td align="center">35.88</td>
-<td align="center">442.52</td>
+<td align="center">NA</td>
 </tr>
-<tr class="even">
-<td align="center">a1</td>
+<tr class="odd">
+<td align="center">a13</td>
 <td align="center">b1</td>
-<td align="center">e1</td>
 <td align="center">d2</td>
+<td align="center">e1</td>
 <td align="center">1.02</td>
 <td align="center">12</td>
 <td align="center">12.24</td>
-<td align="center">150.96</td>
-</tr>
-<tr class="odd">
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.06</td>
-<td align="center">31</td>
-<td align="center">64.88</td>
-<td align="center">1223.64</td>
+<td align="center">NA</td>
 </tr>
 <tr class="even">
-<td align="center">a1</td>
+<td align="center">a13</td>
 <td align="center">b1</td>
+<td align="center">d3</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
+<td align="center">3.48</td>
+<td align="center">11</td>
+<td align="center">NA</td>
+<td align="center">421.08</td>
+</tr>
+<tr class="odd">
+<td align="center">a13</td>
+<td align="center">b1</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">2.18</td>
+<td align="center">22</td>
+<td align="center">NA</td>
+<td align="center">1055.12</td>
+</tr>
+<tr class="even">
+<td align="center">a13</td>
+<td align="center">b1</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
 <td align="center">1.32</td>
 <td align="center">7</td>
-<td align="center">9.24</td>
-<td align="center">69.96</td>
+<td align="center">NA</td>
+<td align="center">64.68</td>
 </tr>
 <tr class="odd">
-<td align="center">a1</td>
+<td align="center">a14</td>
 <td align="center">b2</td>
-<td align="center">e1</td>
 <td align="center">d1</td>
-<td align="center">3.89</td>
-<td align="center">26</td>
-<td align="center">54.70</td>
-<td align="center">970.96</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">32</td>
+<td align="center">40.32</td>
+<td align="center">NA</td>
 </tr>
 <tr class="even">
-<td align="center">a1</td>
+<td align="center">a14</td>
 <td align="center">b2</td>
-<td align="center">e1</td>
 <td align="center">d2</td>
-<td align="center">3.65</td>
-<td align="center">37</td>
-<td align="center">52.31</td>
-<td align="center">964.57</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">8</td>
+<td align="center">25.68</td>
+<td align="center">NA</td>
 </tr>
 <tr class="odd">
-<td align="center">a1</td>
+<td align="center">a14</td>
 <td align="center">b2</td>
+<td align="center">d3</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">5.55</td>
-<td align="center">19</td>
-<td align="center">54.25</td>
-<td align="center">586.75</td>
+<td align="center">NA</td>
+<td align="center">45</td>
+<td align="center">NA</td>
+<td align="center">4698.00</td>
 </tr>
 <tr class="even">
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.33</td>
-<td align="center">6</td>
-<td align="center">13.98</td>
-<td align="center">93.20</td>
+<td align="center">a14</td>
+<td align="center">b2</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">4</td>
+<td align="center">NA</td>
+<td align="center">40.96</td>
 </tr>
 <tr class="odd">
-<td align="center">a1</td>
+<td align="center">a15</td>
 <td align="center">b3</td>
-<td align="center">e2</td>
 <td align="center">d1</td>
-<td align="center">1.87</td>
-<td align="center">28</td>
-<td align="center">52.36</td>
-<td align="center">1473.56</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">14</td>
+<td align="center">42.98</td>
+<td align="center">NA</td>
 </tr>
 <tr class="even">
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.62</td>
-<td align="center">50</td>
-<td align="center">111.70</td>
-<td align="center">3533.70</td>
+<td align="center">a15</td>
+<td align="center">b3</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">30</td>
+<td align="center">NA</td>
+<td align="center">2043.00</td>
 </tr>
 <tr class="odd">
-<td align="center">a2</td>
-<td align="center">b1</td>
+<td align="center">a15</td>
+<td align="center">b3</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">17</td>
+<td align="center">NA</td>
+<td align="center">184.96</td>
+</tr>
+<tr class="even">
+<td align="center">a15</td>
+<td align="center">b3</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">13</td>
+<td align="center">NA</td>
+<td align="center">544.18</td>
+</tr>
+<tr class="odd">
+<td align="center">a16</td>
+<td align="center">b4</td>
+<td align="center">d1</td>
 <td align="center">e1</td>
+<td align="center">1.43</td>
+<td align="center">10</td>
+<td align="center">14.30</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a16</td>
+<td align="center">b4</td>
 <td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">1.97</td>
+<td align="center">18</td>
+<td align="center">35.46</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a16</td>
+<td align="center">b4</td>
+<td align="center">d3</td>
+<td align="center">e2</td>
+<td align="center">2.43</td>
+<td align="center">24</td>
+<td align="center">NA</td>
+<td align="center">1399.68</td>
+</tr>
+<tr class="even">
+<td align="center">a16</td>
+<td align="center">b4</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">2.22</td>
+<td align="center">8</td>
+<td align="center">NA</td>
+<td align="center">142.08</td>
+</tr>
+<tr class="odd">
+<td align="center">a16</td>
+<td align="center">b4</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">2.71</td>
+<td align="center">4</td>
+<td align="center">NA</td>
+<td align="center">43.36</td>
+</tr>
+<tr class="even">
+<td align="center">a17</td>
+<td align="center">b1</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">3.71</td>
+<td align="center">9</td>
+<td align="center">33.39</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a17</td>
+<td align="center">b1</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
 <td align="center">1.94</td>
 <td align="center">23</td>
 <td align="center">44.62</td>
-<td align="center">1034.02</td>
+<td align="center">NA</td>
 </tr>
 <tr class="even">
-<td align="center">a2</td>
+<td align="center">a17</td>
 <td align="center">b1</td>
+<td align="center">d3</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.59</td>
-<td align="center">46</td>
-<td align="center">105.66</td>
-<td align="center">2455.20</td>
+<td align="center">3.84</td>
+<td align="center">5</td>
+<td align="center">NA</td>
+<td align="center">96.00</td>
 </tr>
 <tr class="odd">
-<td align="center">a2</td>
+<td align="center">a17</td>
 <td align="center">b1</td>
+<td align="center">d4</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
+<td align="center">2.34</td>
+<td align="center">24</td>
+<td align="center">NA</td>
+<td align="center">1347.84</td>
+</tr>
+<tr class="even">
+<td align="center">a17</td>
+<td align="center">b1</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
 <td align="center">2.13</td>
 <td align="center">16</td>
-<td align="center">34.08</td>
-<td align="center">553.80</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.82</td>
-<td align="center">42</td>
-<td align="center">65.92</td>
-<td align="center">1561.52</td>
+<td align="center">NA</td>
+<td align="center">545.28</td>
 </tr>
 <tr class="odd">
-<td align="center">a2</td>
+<td align="center">a18</td>
 <td align="center">b2</td>
+<td align="center">d1</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">7.72</td>
-<td align="center">18</td>
-<td align="center">70.78</td>
-<td align="center">687.32</td>
+<td align="center">NA</td>
+<td align="center">20</td>
+<td align="center">44.80</td>
+<td align="center">NA</td>
 </tr>
 <tr class="even">
-<td align="center">a2</td>
+<td align="center">a18</td>
 <td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.78</td>
-<td align="center">33</td>
-<td align="center">74.62</td>
-<td align="center">1927.10</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">10</td>
+<td align="center">27.20</td>
+<td align="center">NA</td>
 </tr>
 <tr class="odd">
-<td align="center">a2</td>
+<td align="center">a18</td>
 <td align="center">b2</td>
+<td align="center">d3</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">2.94</td>
-<td align="center">5</td>
-<td align="center">14.70</td>
-<td align="center">85.26</td>
+<td align="center">NA</td>
+<td align="center">10</td>
+<td align="center">NA</td>
+<td align="center">150.00</td>
 </tr>
 <tr class="even">
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.36</td>
-<td align="center">30</td>
-<td align="center">70.32</td>
-<td align="center">1268.08</td>
+<td align="center">a18</td>
+<td align="center">b2</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
+<td align="center">12</td>
+<td align="center">NA</td>
+<td align="center">443.52</td>
 </tr>
 <tr class="odd">
-<td align="center">a2</td>
+<td align="center">a19</td>
 <td align="center">b3</td>
+<td align="center">d1</td>
 <td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">6.38</td>
-<td align="center">24</td>
-<td align="center">71.52</td>
-<td align="center">1135.90</td>
+<td align="center">NA</td>
+<td align="center">23</td>
+<td align="center">47.15</td>
+<td align="center">NA</td>
 </tr>
 <tr class="even">
-<td align="center">a2</td>
+<td align="center">a19</td>
 <td align="center">b3</td>
+<td align="center">d2</td>
+<td align="center">e1</td>
+<td align="center">NA</td>
+<td align="center">19</td>
+<td align="center">53.77</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">a19</td>
+<td align="center">b3</td>
+<td align="center">d3</td>
 <td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.69</td>
+<td align="center">NA</td>
+<td align="center">14</td>
+<td align="center">NA</td>
+<td align="center">393.96</td>
+</tr>
+<tr class="even">
+<td align="center">a19</td>
+<td align="center">b3</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">NA</td>
 <td align="center">25</td>
-<td align="center">42.25</td>
-<td align="center">1063.01</td>
+<td align="center">NA</td>
+<td align="center">1056.25</td>
 </tr>
 <tr class="odd">
-<td align="center">a2</td>
-<td align="center">b3</td>
+<td align="center">a20</td>
+<td align="center">b4</td>
+<td align="center">d1</td>
+<td align="center">e1</td>
+<td align="center">2.70</td>
+<td align="center">16</td>
+<td align="center">43.20</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">a20</td>
+<td align="center">b4</td>
+<td align="center">d3</td>
 <td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.78</td>
+<td align="center">2.18</td>
+<td align="center">4</td>
+<td align="center">NA</td>
+<td align="center">34.88</td>
+</tr>
+<tr class="odd">
+<td align="center">a20</td>
+<td align="center">b4</td>
+<td align="center">d4</td>
+<td align="center">e2</td>
+<td align="center">1.55</td>
 <td align="center">13</td>
-<td align="center">23.14</td>
-<td align="center">307.94</td>
+<td align="center">NA</td>
+<td align="center">261.95</td>
+</tr>
+<tr class="even">
+<td align="center">a20</td>
+<td align="center">b4</td>
+<td align="center">d5</td>
+<td align="center">e2</td>
+<td align="center">3.32</td>
+<td align="center">5</td>
+<td align="center">NA</td>
+<td align="center">83.00</td>
 </tr>
 </tbody>
 </table>
@@ -1241,110 +2402,184 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="pivot-table-operations" class="section level1">
 <h1>Pivot table operations</h1>
-<p>To transform one or more pivot tables into a flat table, the workflow is as follows:</p>
+<p>To transform one or more pivot tables into a flat table, the workflow
+is as follows:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Pivot table import</strong>: Import pivot tables into an object or list of objects. We start from data in text or Excel files, or previously imported data in a data frame, and generate pivot table objects from them.</p></li>
-<li><p><strong>Pivot table definition</strong>: Study the structure of the data and define the pivot table. If there are several homogeneous pivot tables, we will focus on one, the definition should be applicable to all of them.</p>
+<li><p><strong>Pivot table import</strong>: Import pivot tables into an
+object or list of objects. We start from data in text or Excel files, or
+previously imported data in a data frame, and generate pivot table
+objects from them.</p></li>
+<li><p><strong>Pivot table definition</strong>: Study the structure of
+the data and define the pivot table. If there are several homogeneous
+pivot tables, we will focus on one, the definition should be applicable
+to all of them.</p>
 <ul>
-<li>Define the characteristics of the pivot table: Number of rows and columns with labels, and page value (identifies the pivot table).</li>
-<li>Remove the rows and columns that are not part of the pivot table: It should only contain the rows and columns of labels and an array of values.</li>
+<li>Define the characteristics of the pivot table: Number of rows and
+columns with labels, and page value (identifies the pivot table).</li>
+<li>Remove the rows and columns that are not part of the pivot table: It
+should only contain the rows and columns of labels and an array of
+values.</li>
 </ul></li>
-<li><p><strong>Pivot table transformation</strong>: Optionally, complete or transform the components (labels and values) of the pivot table.</p></li>
-<li><p><strong>Flat table generation</strong>: Generate the flat table from the definition of the pivot table and the available data. If there are multiple pivot tables, apply the defined operations to all of them and merge the result.</p></li>
+<li><p><strong>Pivot table transformation</strong>: Optionally, complete
+or transform the components (labels and values) of the pivot
+table.</p></li>
+<li><p><strong>Flat table generation</strong>: Generate the flat table
+from the definition of the pivot table and the available data. If there
+are multiple pivot tables, apply the defined operations to all of them
+and merge the result.</p></li>
 </ol>
-<p>In this section, the operations available in <code>flattabler</code> package, classified according to this workflow, are presented.</p>
+<p>In this section, the operations available in <code>flattabler</code>
+package, classified according to this workflow, are presented.</p>
 <div id="pivot-table-import" class="section level2">
 <h2>Pivot table import</h2>
-<p>The objective of import operations is to obtain external data that contains one or more pivot tables to transform them. Three formats have been considered: text file, Excel file, and data frame.</p>
-<p>In the case of working with files, the situation of jointly treating all the files in a folder has also been considered. In the case of Excel, alternatively, all the sheets in a file can be treated together.</p>
-<p>The S3 <code>pivot_table</code> class has been defined in the package. Transform operations are defined for objects of this class. Import operations can be classified into two groups: those that return a <code>pivot_table</code> object, and those that return a list of <code>pivot_table</code> objects. Objects in a list can be transformed together.</p>
+<p>The objective of import operations is to obtain external data that
+contains one or more pivot tables to transform them.</p>
+<p>Three formats have been considered: text file, Excel file, and data
+frame.</p>
+<p>In the case of working with files, the situation of jointly treating
+all the files in a folder has also been considered. In the case of
+Excel, alternatively, all the sheets in a file can be treated
+together.</p>
+<p>The S3 <code>pivot_table</code> class has been defined in the
+package. Transform operations are defined for objects of this class.
+Import operations can be classified into two groups: those that return a
+<code>pivot_table</code> object, and those that return a list of
+<code>pivot_table</code> objects. Objects in a list can be transformed
+together.</p>
 <div id="operations-that-return-an-object" class="section level3">
 <h3>Operations that return an object</h3>
 <ul>
-<li><code>pivot_table()</code>: Creates a <code>pivot_table</code> object from a data frame. Page information associated with the pivot table can be defined. Data frame data is converted to character type. Example:</li>
+<li><code>pivot_table()</code>: Creates a <code>pivot_table</code>
+object from a data frame. The data frame is expected to contain one or
+more pivot tables. Additional information associated with the pivot
+table can be indicated. The data frame data is converted to character
+type. Example:</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">unclass</span>(pt_m4)[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">7</span>)])</span>
-<span id="cb4-2"><a href="#cb4-2"></a>pt &lt;-<span class="st"> </span><span class="kw">pivot_table</span>(df, <span class="dt">page =</span> <span class="st">&quot;M4&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">pivot_table</span>(df_ex)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">pivot_table</span>(df_ex, <span class="at">page =</span> <span class="st">&quot;M4&quot;</span>)</span></code></pre></div>
 <ul>
-<li><code>read_text_file()</code>: Reads a text file and creates a <code>pivot_table</code> object. The file is expected to contain one or more pivot tables. Each line in the file corresponds to a row in a table; within each row, columns are defined by a separator character. The file name is included as part of the object attributes. Example:</li>
+<li><code>read_text_file()</code>: Reads a text file and creates a
+<code>pivot_table</code> object. The file is expected to contain one or
+more pivot tables. Each line in the file corresponds to a row in a
+table; within each row, columns are defined by a separator character.
+The file name can be included as part of the object attributes.
+Example:</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_ie.csv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2"></a>pt_set_v_ie &lt;-<span class="st"> </span><span class="kw">read_text_file</span>(file)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_ie.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">read_text_file</span>(file, <span class="at">define_page =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <ul>
-<li><code>read_excel_sheet()</code>:. Reads an Excel file sheet and creates a <code>pivot_table</code> object. The sheet is expected to contain one or more pivot tables. Each line in the sheet corresponds to a row in a table. The file and sheet names are included as part of the object attributes. Example:</li>
+<li><code>read_excel_sheet()</code>: Reads an Excel file sheet and
+creates a <code>pivot_table</code> object. The sheet is expected to
+contain one or more pivot tables. Each line in the sheet corresponds to
+a row in a table. The file and sheet names can be included as part of
+the object attributes. Example:</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excel/ine2871.xlsx&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb6-2"><a href="#cb6-2"></a>pt &lt;-<span class="st"> </span><span class="kw">read_excel_sheet</span>(file)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excel/set_v.xlsx&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">read_excel_sheet</span>(file, <span class="at">define_page =</span> <span class="dv">3</span>)</span></code></pre></div>
 </div>
 <div id="operations-that-return-a-list-of-objects" class="section level3">
 <h3>Operations that return a list of objects</h3>
 <ul>
-<li><code>read_text_folder()</code>: Reads all text files in a folder and creates a list of <code>pivot_table</code> objects, one from each file. Each file is expected to contain a pivot table. Each line in a file corresponds to a row in a table; within each row, columns are defined by a separator character. File name is included as part of each object attributes. Example:</li>
+<li><code>divide()</code>: Divides a table into tables separated by some
+empty row or column. Sometimes multiple pivot tables are placed in a
+text document or Excel sheet, imported as one text table. This operation
+recursively divides the initial table into tables separated by some
+empty row or column. Once a division has been made, it tries to divide
+each part of the result. An object is generated for each indivisible
+pivot table. Returns a list of <code>pivot_table</code> objects.
+Example:</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>folder &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csvfolder&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_text_folder</span>(folder)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">pivot_table</span>(df_set_h_v)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>lpt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">divide</span>()</span></code></pre></div>
 <ul>
-<li><code>read_excel_folder()</code>: Reads one sheet from each of the Excel files in a folder and creates a list of <code>pivot_table</code> objects, one from each sheet or, which is the same in this case, one from each file. Each sheet is expected to contain a pivot table. Each line in a file corresponds to a row in a table. File and sheet names are included as part of each object attributes. Example:</li>
+<li><code>read_text_folder()</code>: Reads all text files in a folder
+and creates a list of <code>pivot_table</code> objects, one from each
+file. Each file is expected to contain a pivot table. Each line in a
+file corresponds to a row in a table; within each row, columns are
+defined by a separator character. File name can be included as part of
+each object attributes. Example:</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>folder &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excelfolder&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_excel_folder</span>(folder)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>folder <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csvfolder&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>lpt <span class="ot">&lt;-</span> <span class="fu">read_text_folder</span>(folder)</span></code></pre></div>
 <ul>
-<li><code>read_excel_file()</code>: Reads sheets from an Excel file and creates a <code>pivot_table</code> object list, one from each sheet. Each sheet is expected to contain a pivot table. Each line in a sheet corresponds to a row in a table. The file and sheet names are included as part of each object attributes. Example:</li>
+<li><code>read_excel_folder()</code>: Reads one sheet from each of the
+Excel files in a folder and creates a list of <code>pivot_table</code>
+objects, one from each sheet or, which is the same in this case, one
+from each file. Each sheet is expected to contain a pivot table. Each
+line in a file corresponds to a row in a table. File and sheet names can
+be included as part of each object attributes. Example:</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excel/set_sheets.xlsx&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb9-2"><a href="#cb9-2"></a>lpt &lt;-<span class="st"> </span><span class="kw">read_excel_file</span>(file)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>folder <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excelfolder&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>lpt <span class="ot">&lt;-</span> <span class="fu">read_excel_folder</span>(folder)</span></code></pre></div>
+<ul>
+<li><code>read_excel_file()</code>: Reads sheets from an Excel file and
+creates a <code>pivot_table</code> object list, one from each sheet.
+Each sheet is expected to contain a pivot table. Each line in a sheet
+corresponds to a row in a table. The file and sheet names are included
+as part of each object attributes. Example:</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;excel/set_sheets.xlsx&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>lpt <span class="ot">&lt;-</span> <span class="fu">read_excel_file</span>(file)</span></code></pre></div>
 </div>
 </div>
 <div id="pivot-table-definition" class="section level2">
 <h2>Pivot table definition</h2>
-<p>Once we have a <code>pivot_table</code> object or list of objects, pivot tables have to be defined. Each object generated by import operations contains a text table, it is expected to contain a pivot table, but may also have more information, generally in the form of a table header or footer. Through this set of operations we transform the text table in the object into a pivot table and define its characteristics.</p>
-<p>A <code>pivot_table</code> object should only contain <strong>label rows and columns</strong>, and an <strong>array of values</strong>, usually numeric data. Additional information can be used to identify the pivot table relative to other similar tables: can be used to define the pivot table <strong>page</strong>.</p>
-<dl>
-<dt>Page</dt>
-<dd>We consider the page of the pivot table as the literal that identifies it with respect to other homogeneous tables; generally it is the value of an attribute (i.e., 2020, 2019,…) or the name of a variable (i.e., amount, profit,…). When multiple pivot tables are integrated into a flat table, the page is essential to distinguish the origin of the data. It is considered as an additional label.
-</dd>
-</dl>
+<p>Once we have a <code>pivot_table</code> object or list of objects,
+pivot tables have to be defined. Each object generated by import
+operations contains a text table, it is expected to contain a pivot
+table, but may also have more information, generally in the form of a
+table header or footer. Through this set of operations we transform the
+text table in the object into a pivot table and define its
+characteristics.</p>
+<p>A <code>pivot_table</code> object should only contain <strong>label
+rows and columns</strong>, and an <strong>matrix of values</strong>,
+usually numeric data. Additional information can be used to identify the
+pivot table relative to other similar tables: can be used to define the
+pivot table <strong>page</strong>.</p>
+<p>Page: We consider the page of the pivot table as the literal that
+identifies it with respect to other homogeneous tables; generally it is
+the value of an attribute (i.e., 2023, 2022,…) or the name of a variable
+(i.e., amount, profit,…). When multiple pivot tables are integrated into
+a flat table, the page is essential to distinguish the origin of the
+data. It is considered as an additional label.</p>
 <p>The workflow is generally as follows:</p>
 <ol style="list-style-type: decimal">
-<li>Explore the table to determine its distribution and characteristics.
-<ul>
-<li>If we start from a list of <code>pivot_table</code> objects, we will explore each one of the tables. In order to transform them together, they should have homogeneous structure. We will use <em>member reference</em> (instead of <em>list slicing</em>) to access the objects in the list. Example: <code>pt &lt;- list_pt_ie[[1]]</code>.</li>
-<li>Exploration can be carried out using <code>utils::View()</code>. Additionally, <code>view_table_attr()</code> can be used since it also shows the attributes of the object.</li>
-</ul></li>
-<li>In case the text table contains multiple pivot tables, they can be obtained using <code>divide()</code>, which returns a list of <code>pivot_table</code> objects; therefore, we return to the first step.</li>
-<li>Define the characteristics of the pivot table: Number of rows and columns with labels, and page value.</li>
-<li>Remove the rows and columns that are not part of the pivot table: It should only contain the rows and columns of labels and an array of values.</li>
+<li><p>Explore the table to determine its distribution and
+characteristics. If we start from a list of <code>pivot_table</code>
+objects, we will explore each one of the tables. In order to transform
+them together, they should have homogeneous structure. We will use
+<em>member reference</em> (instead of <em>list slicing</em>) to access
+the objects in the list. Example:
+<code>pt &lt;- lpt[[1]]</code>.</p></li>
+<li><p>In case the text table contains multiple pivot tables, they can
+be obtained using <code>divide()</code>, which returns a list of
+<code>pivot_table</code> objects; therefore, we return to the first
+step.</p></li>
+<li><p>Define the characteristics of the pivot table: Number of rows and
+columns with labels, and page value.</p></li>
+<li><p>Remove the rows and columns that are not part of the labels or
+matrix of values: It should only contain the rows and columns of labels
+and a matrix of values.</p></li>
 </ol>
-<p>Therefore, four groups of functions are distinguished: Functions to view the object, to split a text table into several, to define the pivot table characteristics, and to remove the rows and columns that are not part of it.</p>
-<div id="view-an-object" class="section level3">
-<h3>View an object</h3>
-<ul>
-<li><code>view_table_attr()</code>: Based on <code>utils::View()</code> but, unlike it, in addition to the table, it also displays the attributes of the object in another window. Example:</li>
-</ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>file &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_ie.csv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2"></a>pt_set_v_ie &lt;-<span class="st"> </span><span class="kw">read_text_file</span>(file)</span>
-<span id="cb10-3"><a href="#cb10-3"></a></span>
-<span id="cb10-4"><a href="#cb10-4"></a>pt_set_v_ie <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">view_table_attr</span>()</span></code></pre></div>
-</div>
-<div id="split-a-text-table" class="section level3">
-<h3>Split a text table</h3>
-<ul>
-<li><code>divide()</code>: Divides a table into tables separated by some empty row or column. Sometimes multiple pivot tables are placed in a text document or Excel sheet, imported as one text table. This operation recursively divides the initial table into tables separated by some empty row or column. Once a division has been made, it tries to divide each part of the result. An object is generated for each indivisible pivot table. Returns a list of <code>pivot_table</code> objects. Example:</li>
-</ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>list_pt_ie &lt;-<span class="st"> </span>pt_set_v_ie <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">divide</span>()</span></code></pre></div>
-</div>
+<p>Therefore, we still need to review the functions for these last two
+steps.: Functions to define the pivot table characteristics, and to
+remove the rows and columns that are not part of it.</p>
 <div id="define-pivot-table-characteristics" class="section level3">
 <h3>Define pivot table characteristics</h3>
 <ul>
-<li><code>get_page()</code> and <code>set_page()</code>: The page value is defined when importing data, sometimes it is included in the file or spreadsheet name. Using these functions, you can get the defined values and redefine them. The content of a table cell or string can be defined as a page value. Example:</li>
+<li><code>get_page()</code> and <code>set_page()</code>: The page value
+is defined when importing data, sometimes it is included in the file or
+spreadsheet name. Using these functions, you can get the defined values
+and redefine them. The content of a table cell or string can be defined
+as a page value. Example:</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>pt &lt;-<span class="st"> </span>list_pt_ie[[<span class="dv">1</span>]]</span>
-<span id="cb12-2"><a href="#cb12-2"></a></span>
-<span id="cb12-3"><a href="#cb12-3"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span></code></pre></div>
 <ul>
-<li><code>define_labels()</code>: A pivot table should only contain label rows and columns, and an array of values, usually numeric data. This function defines the quantity of rows and columns that contain labels. Example:</li>
+<li><code>define_labels()</code>: This function defines the quantity of
+rows and columns that contain labels. Example:</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">define_labels</span>(<span class="at">n_col =</span> <span class="dv">2</span>, <span class="at">n_row =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <div id="remove-rows-and-columns" class="section level3">
 <h3>Remove rows and columns</h3>
@@ -1357,1116 +2592,149 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>remove_left()</code></li>
 <li><code>remove_right()</code></li>
 </ul>
-<p>Remove rows and columns that are not part of the pivot table. The most frequent situation will be having to eliminate the header or footer of the table (top and bottom rows), the rest of the functions are defined to try to contemplate all possible cases. Example:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_top</span>(<span class="dv">1</span>)</span></code></pre></div>
+<p>Remove rows and columns that are not part of the pivot table. The
+most frequent situation will be having to eliminate the header or footer
+of the table (top and bottom rows), the rest of the functions are
+defined to try to contemplate all possible cases. Example:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">remove_top</span>(<span class="dv">1</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="pivot-table-transformation" class="section level2">
 <h2>Pivot table transformation</h2>
-<p>Once a <code>pivot_table</code> object only contains pivot table data, and its attributes have been defined, it could be transformed into a flat table. However, we can take advantage of the table structure to modify and complete it. Therefore, optionally, we can complete and transform the components of the pivot table: Labels and values.</p>
+<p>Once a <code>pivot_table</code> object only contains pivot table
+data, and its attributes have been defined, it could be transformed into
+a flat table. However, we can take advantage of the table structure to
+modify and complete it. Therefore, optionally, we can complete and
+transform the components of the pivot table: Labels and values.</p>
 <div id="transform-labels" class="section level3">
 <h3>Transform labels</h3>
 <ul>
-<li><code>fill_labels()</code>: Fills missing values in row and column labels for a pivot table. When there is more than one row or column with labels, the first ones usually do not repeat the values. In the illustrative example, this occurs in column <em>c1</em> and row <em>r2</em>. In columns they are filled down; in rows to the right. Example:</li>
+<li><code>fill_labels()</code>: Fills missing values in row and column
+labels for a pivot table. When there is more than one row or column with
+labels, the first ones usually do not repeat the values. In the
+illustrative example, this occurs in column <em>c1</em> and row
+<em>r2</em>. By default, in columns they are filled down, in rows to the
+right. Example:</li>
 </ul>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fill_labels</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">fill_labels</span>()</span></code></pre></div>
 <ul>
-<li><code>remove_agg()</code>: Removes pivot table rows and columns that contain aggregated data. Aggregated data is recognized because the label of the row or column closest to the array of values is empty or has a special value as an indicator. Example:</li>
+<li><code>remove_agg()</code>: Removes pivot table rows and columns that
+contain aggregated data. Aggregated data is recognized exclusively
+because the label of the row or column closest to the matrix of values
+is empty. Example:</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_agg</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">remove_agg</span>()</span></code></pre></div>
 <ul>
-<li><code>extract_labels()</code>: Sometimes a table column includes values of multiple label fields, this is generally known as compact table format. Given a column number and a set of labels, it generates a new column with the labels located at the positions they occupied in the original column and removes them from it. Example:</li>
+<li><code>extract_labels()</code>: Sometimes a table column includes
+values of multiple label fields, this is generally known as compact
+table format. Given a column number and a set of labels, it generates a
+new column with the labels located at the positions they occupied in the
+original column and removes them from it. Example:</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>pt2 &lt;-<span class="st"> </span>pt_m4_compact <span class="op">%&gt;%</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a><span class="st">  </span><span class="kw">extract_labels</span>(<span class="dt">col =</span> <span class="dv">1</span>, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;b1&quot;</span>, <span class="st">&quot;b2&quot;</span>, <span class="st">&quot;b3&quot;</span>, <span class="st">&quot;b4&quot;</span>, <span class="st">&quot;Total general&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">pivot_table</span>(df_ex_compact) <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>  <span class="fu">extract_labels</span>(<span class="at">col =</span> <span class="dv">1</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>                 <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;b1&quot;</span>, <span class="st">&quot;b2&quot;</span>, <span class="st">&quot;b3&quot;</span>, <span class="st">&quot;b4&quot;</span>, <span class="st">&quot;Total general&quot;</span>))</span></code></pre></div>
 <ul>
-<li><code>get_col_values()</code>: To facilitate the study of the labels included in the same column of several tables, this function gets the values of the indicated column in a list of tables. It may be useful to use it before <code>extract_labels()</code>. Example:</li>
+<li><code>get_col_values()</code>: To facilitate the study of the labels
+included in the same column of several tables, this function gets the
+values of the indicated column in a list of tables. It may be useful to
+use it before <code>extract_labels()</code>. Example:</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>df &lt;-<span class="st"> </span><span class="kw">get_col_values</span>(list_pt_compact, <span class="dt">start_row =</span> <span class="dv">4</span>)</span>
-<span id="cb18-2"><a href="#cb18-2"></a>labels &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(df<span class="op">$</span>label))</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;csv/set_v_compact.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;flattabler&quot;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>pt <span class="ot">&lt;-</span> <span class="fu">read_text_file</span>(file)</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>lpt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">divide</span>()</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">get_col_values</span>(lpt, <span class="at">start_row =</span> <span class="dv">4</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>labels <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(df<span class="sc">$</span>label))</span></code></pre></div>
 </div>
 <div id="transform-values" class="section level3">
 <h3>Transform values</h3>
 <ul>
-<li><code>fill_values()</code>: The array of values has gaps that, instead of having a numeric value, have an empty string. This operation fills with <code>NA</code> missing values in a pivot table value array. Example:</li>
+<li><code>fill_values()</code>: The array of values has gaps that,
+instead of having a numeric value, have an empty string. This operation
+fills with <code>NA</code> missing values in a pivot table value array.
+Example:</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fill_values</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">fill_values</span>()</span></code></pre></div>
 <ul>
-<li><code>remove_k()</code>: Values, even though they are numbers, are represented as text and sometimes include a thousands separator that can be removed using this function. Example:</li>
+<li><code>remove_k()</code>: Values sometimes include a thousands
+separator that can be removed using this function. Example:</li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">remove_k</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">remove_k</span>()</span></code></pre></div>
 <ul>
-<li><code>replace_dec()</code>: Values, even though they are numbers, are represented as text and sometimes include a decimal separator different from the one needed; it can be replaced using this function. Example:</li>
+<li><code>replace_dec()</code>: Values sometimes include a decimal
+separator different from the one needed; it can be replaced using this
+function. Example:</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>pt &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">replace_dec</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>pt <span class="ot">&lt;-</span> pt <span class="sc">|&gt;</span> <span class="fu">replace_dec</span>()</span></code></pre></div>
 </div>
 </div>
 <div id="flat-table-generation" class="section level2">
 <h2>Flat table generation</h2>
-<p>In order to generate a flat table from a <code>pivot_table</code> object, it is an essential requirement to have properly defined its attributes and that it only contains the pivot table data. Optionally, if the table has a usual structure, we could have transformed the values and labels, if necessary.</p>
-<p>We can generate a flat table from a pivot table (a <code>pivot_table</code> object) or from a list of pivot tables (a list of <code>pivot_table</code> objects).</p>
+<p>In order to generate a flat table from a <code>pivot_table</code>
+object, it is an essential requirement to have properly defined its
+attributes and that <strong>it only contains the pivot table label rows
+and columns, and the matrix of values</strong>. Optionally, if the table
+has a usual structure, we could have transformed the values and labels,
+if necessary.</p>
+<p>We can generate a flat table from a pivot table (a
+<code>pivot_table</code> object) or from a list of pivot tables (a list
+of <code>pivot_table</code> objects).</p>
 <div id="generation-from-a-pivot-table" class="section level3">
 <h3>Generation from a pivot table</h3>
 <ul>
-<li><code>unpivot()</code>: Transforms a pivot table into a flat table (implemented by a <code>tibble</code>). An additional column with page information can be included. <code>NA</code> values can be excluded from the array of values. Example:</li>
+<li><code>unpivot()</code>: Transforms a pivot table into a flat table
+(implemented by a <code>tibble</code>). An additional column with page
+information can be included. <code>NA</code> values can be excluded from
+the array of values. Example:</li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>ft_tmp &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">unpivot</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>ft <span class="ot">&lt;-</span> <span class="fu">pivot_table</span>(df_ex) <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  <span class="fu">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>  <span class="fu">remove_top</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>  <span class="fu">define_labels</span>(<span class="at">n_col =</span> <span class="dv">2</span>, <span class="at">n_row =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>  <span class="fu">fill_labels</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>  <span class="fu">remove_agg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>  <span class="fu">fill_values</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>  <span class="fu">remove_k</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a>  <span class="fu">replace_dec</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a>  <span class="fu">unpivot</span>()</span></code></pre></div>
 </div>
 <div id="generation-from-a-list-of-pivot-tables" class="section level3">
 <h3>Generation from a list of pivot tables</h3>
 <ul>
-<li><code>flatten_table_list()</code>: Given a list of <code>pivot_table</code> objects and a transformation function that flattens a <code>pivot_table</code> object, transforms each table using the function and merges the results into a flat table. Example:</li>
+<li><code>flatten_table_list()</code>: Given a list of
+<code>pivot_table</code> objects and a transformation function that
+flattens a <code>pivot_table</code> object, transforms each table using
+the function and merges the results into a flat table. Example:</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>f &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
-<span id="cb23-2"><a href="#cb23-2"></a>  pt <span class="op">%&gt;%</span></span>
-<span id="cb23-3"><a href="#cb23-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb23-4"><a href="#cb23-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb23-5"><a href="#cb23-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb23-6"><a href="#cb23-6"></a><span class="st">    </span><span class="kw">fill_labels</span>() <span class="op">%&gt;%</span></span>
-<span id="cb23-7"><a href="#cb23-7"></a><span class="st">    </span><span class="kw">remove_agg</span>() <span class="op">%&gt;%</span></span>
-<span id="cb23-8"><a href="#cb23-8"></a><span class="st">    </span><span class="kw">fill_values</span>() <span class="op">%&gt;%</span></span>
-<span id="cb23-9"><a href="#cb23-9"></a><span class="st">    </span><span class="kw">remove_k</span>() <span class="op">%&gt;%</span></span>
-<span id="cb23-10"><a href="#cb23-10"></a><span class="st">    </span><span class="kw">replace_dec</span>() <span class="op">%&gt;%</span></span>
-<span id="cb23-11"><a href="#cb23-11"></a><span class="st">    </span><span class="kw">unpivot</span>()</span>
-<span id="cb23-12"><a href="#cb23-12"></a>}</span>
-<span id="cb23-13"><a href="#cb23-13"></a></span>
-<span id="cb23-14"><a href="#cb23-14"></a>ft &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, f)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(pt) {</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>  pt <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>    <span class="fu">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>    <span class="fu">define_labels</span>(<span class="at">n_col =</span> <span class="dv">2</span>, <span class="at">n_row =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>    <span class="fu">remove_top</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>    <span class="fu">fill_labels</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>    <span class="fu">remove_agg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a>    <span class="fu">fill_values</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a>    <span class="fu">remove_k</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a>    <span class="fu">replace_dec</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a>    <span class="fu">unpivot</span>()</span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>}</span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a>ft <span class="ot">&lt;-</span> <span class="fu">flatten_table_list</span>(lpt, f)</span></code></pre></div>
 </div>
-</div>
-</div>
-<div id="flat-table-transformation-1" class="section level1">
-<h1>Flat table transformation</h1>
-<p>In this section, complementary and alternative operations that can be carried out on a flat table are presented. Complementary operations are useful to transform the flat table even after previously transforming the pivot table. Alternative operations are necessary if equivalent operations could not be performed on the pivot table for some reason.</p>
-<p>These operations are not supported by package <code>flattabler</code>, they are supported by the components of <code>tidyverse</code> package. Here only a sample is presented. It is recommended to read the <a href="https://r4ds.had.co.nz/">R for Data Science</a> book (at least chapters 5 and 12).</p>
-<div id="complementary-transformations" class="section level2">
-<h2>Complementary transformations</h2>
-<p>We start from a flat table <code>ft</code> generated in the previous section through the operation <code>flatten_table_list()</code>.</p>
-<ul>
-<li><code>tidyr::pivot_wider()</code>: It is needed when an observation is distributed among several rows. One column contains the name of the observation variables and another contains the values. In the example, we had a pivot table for each variable. The variable name is in <code>page</code> column. Example:</li>
-</ul>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) </span></code></pre></div>
-<ul>
-<li><code>dplyr::rename()</code>: It allows us to change the name of the columns of the flat table. Example:</li>
-</ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) </span></code></pre></div>
-<ul>
-<li><code>dplyr::arrange()</code>: It allows us to order the rows of the flat table according to the selected columns. Example:</li>
-</ul>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>ft &lt;-<span class="st"> </span>ft <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D) </span></code></pre></div>
-</div>
-<div id="alternative-transformations" class="section level2">
-<h2>Alternative transformations</h2>
-<p>We consider the same data from the illustrative example. This is not the case, but let us suppose a situation in which the transformations cannot be performed on the pivot table (because its structure does not coincide with the assumptions of the operations).</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>pt &lt;-<span class="st"> </span>list_pt_ie[[<span class="dv">1</span>]]</span>
-<span id="cb27-2"><a href="#cb27-2"></a></span>
-<span id="cb27-3"><a href="#cb27-3"></a>ft_at &lt;-<span class="st"> </span>pt <span class="op">%&gt;%</span></span>
-<span id="cb27-4"><a href="#cb27-4"></a><span class="st">  </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb27-5"><a href="#cb27-5"></a><span class="st">  </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb27-6"><a href="#cb27-6"></a><span class="st">  </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb27-7"><a href="#cb27-7"></a><span class="st">  </span><span class="kw">unpivot</span>()</span></code></pre></div>
-<p>The only operations we perform are those for defining the pivot table and generating the flat table. The result obtained is shown below.</p>
-<table style="width:85%;">
-<colgroup>
-<col width="9%"></col>
-<col width="22%"></col>
-<col width="9%"></col>
-<col width="22%"></col>
-<col width="9%"></col>
-<col width="11%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">page</th>
-<th align="center">col1</th>
-<th align="center">col2</th>
-<th align="center">row1</th>
-<th align="center">row2</th>
-<th align="center">value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2,99</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">1,02</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">4,01</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4,06</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">1,32</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">5,38</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">9,39</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3,89</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">3,65</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">7,54</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">5,55</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center"></td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">5,55</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">13,09</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2,33</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center"></td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">2,33</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1,87</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center"></td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">1,87</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">4,2</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">9,21</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">4,67</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">13,88</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">11,48</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">1,32</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">12,8</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a1</td>
-<td align="center"></td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">26,68</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5,62</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">1,94</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">7,56</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4,59</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">2,13</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">6,72</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">14,28</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3,82</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">7,72</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">11,54</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4,78</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">2,94</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">7,72</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b2</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">19,26</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5,36</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">6,38</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">11,74</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1,69</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">1,78</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">3,47</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center"></td>
-<td align="center">b3</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">15,21</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">14,8</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">16,04</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">30,84</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">11,06</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">6,85</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">17,91</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total a2</td>
-<td align="center"></td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">48,75</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">24,01</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">20,71</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">Total e1</td>
-<td align="center"></td>
-<td align="center">44,72</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">22,54</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">d2</td>
-<td align="center">8,17</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">Total e2</td>
-<td align="center"></td>
-<td align="center">30,71</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">Total general</td>
-<td align="center"></td>
-<td align="center">75,43</td>
-</tr>
-</tbody>
-</table>
-<p>The functions that we need to apply to carry out the transformation are the following:</p>
-<ul>
-<li><code>dplyr::mutate_all()</code>: Apply the indicated function to all the columns of the table. We replace empty strings with <code>NA</code>. Example:</li>
-</ul>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate_all</span>( <span class="op">~</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">na_if</span>(., <span class="st">&quot;&quot;</span>))</span></code></pre></div>
-<ul>
-<li><code>tidyr::fill()</code>: Fill in the missing values for the columns. The filling direction can be indicated. Example:</li>
-</ul>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>tidyr<span class="op">::</span><span class="kw">fill</span>(col1, row1)</span></code></pre></div>
-<ul>
-<li><code>dplyr::filter()</code>: Subset the table, retaining all rows that satisfy the condition. We remove the aggregates (label of the row or column closest to the array of values is empty) and <code>NA</code> values in the array of values. Example:</li>
-</ul>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(col2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(row2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(value))</span></code></pre></div>
-<ul>
-<li><code>dplyr::mutate_at()</code>: Apply the indicated function to some of the columns of the table. We remove the thousands indicators and change the decimal indicator. Example:</li>
-</ul>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>ft_at &lt;-<span class="st"> </span>ft_at <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb31-2"><a href="#cb31-2"></a>                                    <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(., <span class="dt">pattern =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb31-3"><a href="#cb31-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb31-4"><a href="#cb31-4"></a>                   <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace</span>(., <span class="dt">pattern =</span> <span class="st">&quot;,&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>))</span></code></pre></div>
-<p>As in the previous case, they can be combined to define a function and apply the transformations to all the objects in a list.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>g &lt;-<span class="st"> </span><span class="cf">function</span>(pt) {</span>
-<span id="cb32-2"><a href="#cb32-2"></a>  pt <span class="op">%&gt;%</span></span>
-<span id="cb32-3"><a href="#cb32-3"></a><span class="st">    </span><span class="kw">set_page</span>(<span class="dv">1</span>, <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb32-4"><a href="#cb32-4"></a><span class="st">    </span><span class="kw">define_labels</span>(<span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">n_row =</span> <span class="dv">2</span>) <span class="op">%&gt;%</span></span>
-<span id="cb32-5"><a href="#cb32-5"></a><span class="st">    </span><span class="kw">remove_top</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span></span>
-<span id="cb32-6"><a href="#cb32-6"></a><span class="st">    </span><span class="kw">unpivot</span>() <span class="op">%&gt;%</span></span>
-<span id="cb32-7"><a href="#cb32-7"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_all</span>(<span class="op">~</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">na_if</span>(., <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb32-8"><a href="#cb32-8"></a><span class="st">    </span>tidyr<span class="op">::</span><span class="kw">fill</span>(col1, row1) <span class="op">%&gt;%</span></span>
-<span id="cb32-9"><a href="#cb32-9"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(col2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(row2) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(value)) <span class="op">%&gt;%</span></span>
-<span id="cb32-10"><a href="#cb32-10"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb32-11"><a href="#cb32-11"></a>                     <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(., <span class="dt">pattern =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb32-12"><a href="#cb32-12"></a><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">mutate_at</span>(<span class="kw">c</span>(<span class="st">&quot;value&quot;</span>),</span>
-<span id="cb32-13"><a href="#cb32-13"></a>                     <span class="op">~</span><span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace</span>(., <span class="dt">pattern =</span> <span class="st">&quot;,&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>))</span>
-<span id="cb32-14"><a href="#cb32-14"></a>}</span>
-<span id="cb32-15"><a href="#cb32-15"></a></span>
-<span id="cb32-16"><a href="#cb32-16"></a>ft2 &lt;-<span class="st"> </span><span class="kw">flatten_table_list</span>(list_pt_ie, g)</span></code></pre></div>
-<p>The result coincides with the one previously obtained. Below is a sample.</p>
-<table style="width:62%;">
-<colgroup>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="9%"></col>
-<col width="13%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">page</th>
-<th align="center">col1</th>
-<th align="center">col2</th>
-<th align="center">row1</th>
-<th align="center">row2</th>
-<th align="center">value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.89</td>
-</tr>
-<tr class="even">
-<td align="center">M1</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.87</td>
-</tr>
-<tr class="odd">
-<td align="center">M1</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.36</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">26</td>
-</tr>
-<tr class="odd">
-<td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">37</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">6</td>
-</tr>
-<tr class="odd">
-<td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">50</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">23</td>
-</tr>
-<tr class="odd">
-<td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">42</td>
-</tr>
-<tr class="even">
-<td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">18</td>
-</tr>
-<tr class="odd">
-<td align="center">M2</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">33</td>
-</tr>
-<tr class="even">
-<td align="center">M3</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">54.25</td>
-</tr>
-<tr class="odd">
-<td align="center">M3</td>
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">52.36</td>
-</tr>
-<tr class="even">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">70.78</td>
-</tr>
-<tr class="odd">
-<td align="center">M3</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">42.25</td>
-</tr>
-<tr class="even">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">442.52</td>
-</tr>
-<tr class="odd">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">150.96</td>
-</tr>
-<tr class="even">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1223.64</td>
-</tr>
-<tr class="odd">
-<td align="center">M4</td>
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">964.57</td>
-</tr>
-<tr class="even">
-<td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">553.80</td>
-</tr>
-<tr class="odd">
-<td align="center">M4</td>
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">1268.08</td>
-</tr>
-</tbody>
-</table>
-<p>Finally, below you can see all the data once transformed.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>t2 &lt;-<span class="st"> </span>ft2 <span class="op">%&gt;%</span></span>
-<span id="cb33-2"><a href="#cb33-2"></a><span class="st">  </span>tidyr<span class="op">::</span><span class="kw">pivot_wider</span>(<span class="dt">names_from =</span> page, <span class="dt">values_from =</span> value) <span class="op">%&gt;%</span></span>
-<span id="cb33-3"><a href="#cb33-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">A =</span> col1, <span class="dt">B =</span> col2, <span class="dt">E =</span> row1, <span class="dt">D =</span> row2) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb33-4"><a href="#cb33-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(A, B, E, D)</span></code></pre></div>
-<table style="width:71%;">
-<colgroup>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="9%"></col>
-<col width="6%"></col>
-<col width="12%"></col>
-<col width="13%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">A</th>
-<th align="center">B</th>
-<th align="center">E</th>
-<th align="center">D</th>
-<th align="center">M1</th>
-<th align="center">M2</th>
-<th align="center">M3</th>
-<th align="center">M4</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.99</td>
-<td align="center">12</td>
-<td align="center">35.88</td>
-<td align="center">442.52</td>
-</tr>
-<tr class="even">
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.02</td>
-<td align="center">12</td>
-<td align="center">12.24</td>
-<td align="center">150.96</td>
-</tr>
-<tr class="odd">
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.06</td>
-<td align="center">31</td>
-<td align="center">64.88</td>
-<td align="center">1223.64</td>
-</tr>
-<tr class="even">
-<td align="center">a1</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.32</td>
-<td align="center">7</td>
-<td align="center">9.24</td>
-<td align="center">69.96</td>
-</tr>
-<tr class="odd">
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.89</td>
-<td align="center">26</td>
-<td align="center">54.70</td>
-<td align="center">970.96</td>
-</tr>
-<tr class="even">
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">3.65</td>
-<td align="center">37</td>
-<td align="center">52.31</td>
-<td align="center">964.57</td>
-</tr>
-<tr class="odd">
-<td align="center">a1</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">5.55</td>
-<td align="center">19</td>
-<td align="center">54.25</td>
-<td align="center">586.75</td>
-</tr>
-<tr class="even">
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">2.33</td>
-<td align="center">6</td>
-<td align="center">13.98</td>
-<td align="center">93.20</td>
-</tr>
-<tr class="odd">
-<td align="center">a1</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.87</td>
-<td align="center">28</td>
-<td align="center">52.36</td>
-<td align="center">1473.56</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.62</td>
-<td align="center">50</td>
-<td align="center">111.70</td>
-<td align="center">3533.70</td>
-</tr>
-<tr class="odd">
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">1.94</td>
-<td align="center">23</td>
-<td align="center">44.62</td>
-<td align="center">1034.02</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.59</td>
-<td align="center">46</td>
-<td align="center">105.66</td>
-<td align="center">2455.20</td>
-</tr>
-<tr class="odd">
-<td align="center">a2</td>
-<td align="center">b1</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">2.13</td>
-<td align="center">16</td>
-<td align="center">34.08</td>
-<td align="center">553.80</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">3.82</td>
-<td align="center">42</td>
-<td align="center">65.92</td>
-<td align="center">1561.52</td>
-</tr>
-<tr class="odd">
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">7.72</td>
-<td align="center">18</td>
-<td align="center">70.78</td>
-<td align="center">687.32</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">4.78</td>
-<td align="center">33</td>
-<td align="center">74.62</td>
-<td align="center">1927.10</td>
-</tr>
-<tr class="odd">
-<td align="center">a2</td>
-<td align="center">b2</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">2.94</td>
-<td align="center">5</td>
-<td align="center">14.70</td>
-<td align="center">85.26</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d1</td>
-<td align="center">5.36</td>
-<td align="center">30</td>
-<td align="center">70.32</td>
-<td align="center">1268.08</td>
-</tr>
-<tr class="odd">
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e1</td>
-<td align="center">d2</td>
-<td align="center">6.38</td>
-<td align="center">24</td>
-<td align="center">71.52</td>
-<td align="center">1135.90</td>
-</tr>
-<tr class="even">
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d1</td>
-<td align="center">1.69</td>
-<td align="center">25</td>
-<td align="center">42.25</td>
-<td align="center">1063.01</td>
-</tr>
-<tr class="odd">
-<td align="center">a2</td>
-<td align="center">b3</td>
-<td align="center">e2</td>
-<td align="center">d2</td>
-<td align="center">1.78</td>
-<td align="center">13</td>
-<td align="center">23.14</td>
-<td align="center">307.94</td>
-</tr>
-</tbody>
-</table>
-<p>The result obtained is the same. From my point of view, transformations carried out taking advantage of the structure of the pivot table are simpler and more intuitive. However, if necessary, this set of operations can help resolve special situations not yet considered in <code>flattabler</code> package.</p>
 </div>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
-<p><code>flattabler</code> package offers a set of operations that allow us to transform one or more pivot tables into a flat table. Transformation operations have been designed to be intuitive and easy to use. With them, it has been possible to properly transform all the pivot tables found so far by the author.</p>
-<p>If an unforeseen situation arises, the proposed operations are also useful and can be supplemented by operations available in the components of <code>tidyverse</code> package, as also shown in this document.</p>
+<p><code>flattabler</code> package offers a set of operations that allow
+us to transform one or more pivot tables into a flat table.
+Transformation operations have been designed to be intuitive and easy to
+use. With them, it has been possible to properly transform all the pivot
+tables found so far by the author.</p>
+<p>If an unforeseen situation arises, the proposed operations are also
+useful and can be supplemented by operations available in the components
+of <a href="https://CRAN.R-project.org/package=tidyverse"><code>tidyverse</code></a>
+package.</p>
 </div>
 
 
