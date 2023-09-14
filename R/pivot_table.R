@@ -33,7 +33,7 @@ pivot_table <- function(df,
                         page_col = 0,
                         n_col_labels = 0,
                         n_row_labels = 0) {
-  stopifnot(is.data.frame(df))
+  stopifnot("A data frame was expected." = is.data.frame(df))
   df <-
     data.frame(lapply(df, as.character), stringsAsFactors = FALSE)
   df <- assign_names(df)
@@ -939,8 +939,9 @@ spacer_columns <- function(df) {
 #' @param pt A `pivot_table` object.
 #' @param include_page A boolean, indicates whether a column with the page
 #'   information is included or not.
-#' @param na.rm A boolean, indicates whether NA values from the array of values
+#' @param na_rm A boolean, indicates whether NA values from the array of values
 #'   are removed or not.
+#' @param keep_col_names A boolean, if possible, keep the column names.
 #'
 #' @return A `tibble`.
 #'
@@ -968,13 +969,14 @@ spacer_columns <- function(df) {
 #'   unpivot()
 #'
 #' @export
-unpivot <- function(pt, include_page, na.rm) UseMethod("unpivot")
+unpivot <- function(pt, include_page, na_rm, keep_col_names) UseMethod("unpivot")
 
 #' @rdname unpivot
 #' @export
 unpivot.pivot_table <- function(pt,
-                                 include_page = TRUE,
-                                 na.rm = TRUE)
+                                include_page = TRUE,
+                                na_rm = TRUE,
+                                keep_col_names = FALSE)
 {
   n_col <- pt$n_col_labels
   n_row <- pt$n_row_labels
@@ -987,49 +989,78 @@ unpivot.pivot_table <- function(pt,
     page_v <- NULL
     n_pag <- 0
   }
-  df <-
-    data.frame(matrix(
-      ncol = n_pag + n_col + n_row + 1,
-      nrow = (ncol(pt$df) - n_col) * (nrow(pt$df) - n_row)
-    ),
-    stringsAsFactors = FALSE)
   if (n_col > 0) {
     seq_c <- 1:n_col
     for (c in seq_c) {
-      names <- c(names, sprintf("col%d", c))
+      if (keep_col_names & n_row > 0) {
+        col_name <- pt$df[n_row, c]
+        if (length(col_name) == 0) {
+          col_name  <- sprintf("col%d", c)
+        } else if (trimws(col_name) == "") {
+          col_name  <- sprintf("col%d", c)
+        }
+      } else {
+        col_name <- sprintf("col%d", c)
+      }
+      names <- c(names, col_name)
     }
   } else {
     seq_c <- NULL
   }
-  if (n_row > 0) {
+  if (n_col == ncol(pt$df)) {
+    df <-
+      data.frame(matrix(
+        ncol = n_pag + n_col,
+        nrow = nrow(pt$df) - n_row
+      ),
+      stringsAsFactors = FALSE)
+  }
+  else {
+    df <-
+      data.frame(matrix(
+        ncol = n_pag + n_col + n_row + 1,
+        nrow = (ncol(pt$df) - n_col) * (nrow(pt$df) - n_row)
+      ),
+      stringsAsFactors = FALSE)
+  }
+  if (n_row > 0 & n_col < ncol(pt$df)) {
     seq_r <- 1:n_row
     for (r in seq_r) {
       names <- c(names, sprintf("row%d", r))
     }
+    names <- c(names, "value")
   } else {
     seq_r <- NULL
   }
-  colnames(df) <- c(names, "value")
+  colnames(df) <- names
 
   k <- 1
   if (n_pag == 1) {
     df[, k] <- page_v
     k <- k + 1
   }
-  for (j in 1:n_col) {
-    df[, k] <-
-      rep(pt$df[(n_row + 1):nrow(pt$df), j], each = ncol(pt$df) - n_col)
-    k <- k + 1
+  if (n_col == ncol(pt$df)) {
+    for (j in 1:n_col) {
+      df[, k] <- pt$df[(n_row + 1):nrow(pt$df), j]
+      k <- k + 1
+    }
   }
-  for (i in 1:n_row) {
+  else {
+    for (j in 1:n_col) {
+      df[, k] <-
+        rep(pt$df[(n_row + 1):nrow(pt$df), j], each = ncol(pt$df) - n_col)
+      k <- k + 1
+    }
+    for (i in 1:n_row) {
+      df[, k] <-
+        rep(t(pt$df[i, (n_col + 1):ncol(pt$df)]), nrow(pt$df) - n_row)
+      k <- k + 1
+    }
     df[, k] <-
-      rep(t(pt$df[i, (n_col + 1):ncol(pt$df)]), nrow(pt$df) - n_row)
-    k <- k + 1
-  }
-  df[, k] <-
-    as.vector(t(pt$df[(n_row + 1):nrow(pt$df), (n_col + 1):ncol(pt$df)]))
-  if (na.rm) {
-    df <- df[!is.na(df[, k]), ]
+      as.vector(t(pt$df[(n_row + 1):nrow(pt$df), (n_col + 1):ncol(pt$df)]))
+    if (na_rm) {
+      df <- df[!is.na(df[, k]), ]
+    }
   }
   tibble::tibble(df)
 }

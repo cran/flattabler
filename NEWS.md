@@ -1,3 +1,7 @@
+# flattabler 2.1.0
+* Add `keep_col_names` and `na_rm` parameters to `unpivot` function.
+* Read the indicated sheets from a folder of Excel files in `read_excel_folder()`.
+
 # flattabler 2.0.0
 * New data model for `pivot_table` class, vectorial algorithm for `unpivot()`.
 * New examples for README and vignette.
