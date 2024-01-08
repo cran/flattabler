@@ -1,10 +1,10 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- results = "asis", echo = FALSE------------------------------------------
+## ----results = "asis", echo = FALSE-------------------------------------------
 pt <- flattabler::df_ex
 rownames(pt) <- sprintf("r%d",1:nrow(pt))
 colnames(pt) <- sprintf("c%d",1:ncol(pt))
@@ -24,7 +24,7 @@ ft <- pivot_table(df_ex) |>
   replace_dec() |>
   unpivot()
 
-## ---- results = "asis", echo = FALSE------------------------------------------
+## ----results = "asis", echo = FALSE-------------------------------------------
 pander::pandoc.table(ft)
 
 ## -----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ class(lpt[[1]])
 ## -----------------------------------------------------------------------------
 ftl <- flatten_table_list(lpt, f)
 
-## ---- results = "asis", echo = FALSE------------------------------------------
+## ----results = "asis", echo = FALSE-------------------------------------------
 ft_sample <- dplyr::slice_sample(ftl, prop = 0.20) |> 
     dplyr::arrange(page, col1, col2, row1, row2)
 pander::pandoc.table(ft_sample)
@@ -62,7 +62,7 @@ t <- ftl |>
   dplyr::select(A, B, D, E, M1, M2, M3, M4) |> 
   dplyr::arrange(A, B, D, E)
 
-## ---- results = "asis", echo = FALSE------------------------------------------
+## ----results = "asis", echo = FALSE-------------------------------------------
 pander::pandoc.table(t)
 
 ## -----------------------------------------------------------------------------

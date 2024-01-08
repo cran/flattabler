@@ -22,8 +22,8 @@
 #'
 #' @examples
 #'
-#' # file <- system.file("extdata", "csvfolder/m4.csv", package = "flattabler")
-#' # pt <- read_text_file(file)
+#' file <- system.file("extdata", "m4.csv", package = "flattabler")
+#' pt <- read_text_file(file)
 #'
 #' @export
 read_text_file <- function(file, sep = ';', encoding = "UTF-8", define_page = TRUE) {
@@ -33,13 +33,12 @@ read_text_file <- function(file, sep = ';', encoding = "UTF-8", define_page = TR
     page <- ""
   }
   pivot_table(
-    utils::read.table(
+    readr::read_delim(
       file,
-      sep = sep,
-      header = FALSE,
-      stringsAsFactors = FALSE,
-      encoding = encoding,
-      colClasses = c("character")
+      delim = sep,
+      col_names = FALSE,
+      skip_empty_rows = FALSE,
+      col_types = readr::cols(.default = readr::col_character())
     ),
     page
   )
@@ -68,8 +67,8 @@ read_text_file <- function(file, sep = ';', encoding = "UTF-8", define_page = TR
 #'
 #' @examples
 #'
-#' # folder <- system.file("extdata", "csvfolder", package = "flattabler")
-#' # lpt <- read_text_folder(folder)
+#' folder <- system.file("extdata", "csvfolder", package = "flattabler")
+#' lpt <- read_text_folder(folder)
 #'
 #' @export
 read_text_folder <-

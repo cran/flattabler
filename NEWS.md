@@ -1,3 +1,7 @@
+# flattabler 2.1.1
+* Modify the cph field of the description.
+* Improve read excel files test.
+
 # flattabler 2.1.0
 * Add `keep_col_names` and `na_rm` parameters to `unpivot` function.
 * Read the indicated sheets from a folder of Excel files in `read_excel_folder()`.
