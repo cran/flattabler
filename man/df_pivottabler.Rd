@@ -19,8 +19,8 @@ A dataset containing number of train passengers, generated with the
 }
 \seealso{
 Other pivot table in data frame: 
-\code{\link{df_ex_compact}},
-\code{\link{df_ex}}
+\code{\link{df_ex}},
+\code{\link{df_ex_compact}}
 }
 \concept{pivot table in data frame}
 \keyword{datasets}

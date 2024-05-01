@@ -38,8 +38,8 @@ ft_set <- flatten_table_list(lpt, f)
 \code{\link{df_set_h_v}}
 
 Other flat table: 
-\code{\link{ft_ex_v2}},
-\code{\link{ft_ex}}
+\code{\link{ft_ex}},
+\code{\link{ft_ex_v2}}
 }
 \concept{flat table}
 \keyword{datasets}

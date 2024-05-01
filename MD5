@@ -1,7 +1,7 @@
-7b62f39d0c323caf3258d9b7263ab54d *DESCRIPTION
-1308c73afb98c42b391153e941d622ac *LICENSE
+26f95ede2d69313188a3d0ecf7e37f8a *DESCRIPTION
+cc0c12c08e4f668abefe3bc3323c2f76 *LICENSE
 6c5c945351f096891a8d774f5dfcdd42 *NAMESPACE
-f4892bed039cf7acd6d798a10a89c628 *NEWS.md
+8b99f56cf52af27de145c82a72c2bbe4 *NEWS.md
 38c8384c622e5add51292173b674c848 *R/data.R
 d3bc0731dab1ede6fc8e2fbec905fb47 *R/pivot_table.R
 917b9395b14c0fb4c1743d123ecadd13 *R/read_excel.R
@@ -22,7 +22,7 @@ d5e8756572b3ee1fd07d0663feb9f830 *data/pf_ex_compact.rda
 8d16c6d428b701467342939e3550bb64 *data/pt_ex.rda
 02cf8da63962377c568142bb9b1c7dce *inst/doc/flattabler.R
 c8996293186c9368b8e026c45dc9b5c7 *inst/doc/flattabler.Rmd
-63c0d980df55f6b03c109f71ee813443 *inst/doc/flattabler.html
+f1d8c8b61cb2bec63434d090108b7a59 *inst/doc/flattabler.html
 fd7aba42896b6540c3be0034f342888b *inst/extdata/csv/set_h.csv
 4eb7674fb9a0f650130405d168a02d13 *inst/extdata/csv/set_h_v.csv
 0482ab5b78caf1c66fe9768189949783 *inst/extdata/csv/set_v.csv
@@ -51,10 +51,10 @@ ec5489a0ad5671868e2862216f273ad5 *inst/extdata/m4.csv
 2a68f6f8c47f3437be209378cffdf183 *man/define_labels.Rd
 f1a13dd98144e1179a1b79c9a6631f58 *man/df_ex.Rd
 31c7c387dfa72b6d05cee51c33d67b05 *man/df_ex_compact.Rd
-ae1a5860b313a87f452da0b5c2d555b7 *man/df_pivottabler.Rd
+2898e8df95ac98d2c88be41c89b15983 *man/df_pivottabler.Rd
 14ce39fab3d28a314b729caf07cd36cf *man/df_set_h.Rd
 311622f89f6e9caec044d8ee0f656582 *man/df_set_h_v.Rd
-beff86ebc6649b11cf7be829e2a74b62 *man/df_set_v.Rd
+646a6e31feb44019505a418144d1b95a *man/df_set_v.Rd
 6b5745b7d2c47f3ea9eeb4449fa6ab98 *man/divide.Rd
 37ba2ac8733ad4fe1cb9344f8cdf9546 *man/extract_labels.Rd
 25863e21adb956a6c7b9d3f7899af999 *man/figures/logo.png
@@ -64,7 +64,7 @@ beb2735eb4bfb938a329777f040ed348 *man/fill_vector.Rd
 4d10b99afa05b8cc92f6dbb10856b830 *man/flatten_table_list.Rd
 d58455442b8c07700a273dc26fa0ff3b *man/ft_ex.Rd
 610a6e38835b7d87c08a7f06238157c1 *man/ft_ex_v2.Rd
-d40d4b1484f90d4df55bfb62e2f87046 *man/ft_set.Rd
+3deaf7b9fee5d8b381b8e85ca6958622 *man/ft_set.Rd
 779696ba7dfab41dd721cb465b719725 *man/get_col_values.Rd
 8180e2e70846b643a81b9a79e034979a *man/get_page.Rd
 e16d8ecd42329ded93a7e0eac0111861 *man/pf_ex_compact.Rd

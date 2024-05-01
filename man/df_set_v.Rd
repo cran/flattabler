@@ -17,8 +17,8 @@ Set of pivot tables placed vertically on one sheet.
 \code{\link{df_ex}}
 
 Other pivot table set in data frame: 
-\code{\link{df_set_h_v}},
-\code{\link{df_set_h}}
+\code{\link{df_set_h}},
+\code{\link{df_set_h_v}}
 }
 \concept{pivot table set in data frame}
 \keyword{datasets}
